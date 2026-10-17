@@ -8,53 +8,53 @@ const SECRET_KEY = 'tripinn-super-secret-key-2026';
 const TICKET_TEMPLATE = 'Template_bg.png';
 
 // Sample travelers for preview / fallback mode
-const SAMPLE_TRAVELERS = [
-  {
-    ticketId: 'TRIPINN-KD-01',
-    name: 'KARTHIK SUBRAMANIAN',
-    phone: '+91 90000 00001',
-    trip: 'KODAIKANAL',
-    tag: 'HILL STATION GETAWAY',
-    date: '17 Oct - 20 Oct, 2026',
-    duration: '3 Days / 2 Nights'
-  },
-  {
-    ticketId: 'TRIPINN-KD-02',
-    name: 'DEEPIKA SUBRAMANIAN',
-    phone: '+91 90000 00001',
-    trip: 'KODAIKANAL',
-    tag: 'HILL STATION GETAWAY',
-    date: '17 Oct - 20 Oct, 2026',
-    duration: '3 Days / 2 Nights'
-  },
-  {
-    ticketId: 'TRIPINN-KD-03',
-    name: 'ARJUN SUBRAMANIAN',
-    phone: '+91 90000 00001',
-    trip: 'MUNNAR',
-    tag: 'HILL STATION GETAWAY',
-    date: 'Oct 24-26, 2026',
-    duration: '3 Days / 2 Nights'
-  },
-  {
-    ticketId: 'TRIPINN-KD-04',
-    name: 'MEERA SUBRAMANIAN',
-    phone: '+91 90000 00001',
-    trip: 'MUNNAR',
-    tag: 'HILL STATION GETAWAY',
-    date: 'Oct 24-26, 2026',
-    duration: '3 Days / 2 Nights'
-  },
-  {
-    ticketId: 'TRIPINN-KD-05',
-    name: 'VIGNESH KUMAR',
-    phone: '+91 90000 00002',
-    trip: 'KODAIKANAL',
-    tag: 'HILL STATION GETAWAY',
-    date: '17 Oct - 20 Oct, 2026',
-    duration: '3 Days / 2 Nights'
-  }
-];
+// const SAMPLE_TRAVELERS = [
+//   {
+//     ticketId: 'TRIPINN-KD-01',
+//     name: 'KARTHIK SUBRAMANIAN',
+//     phone: '+91 90000 00001',
+//     trip: 'KODAIKANAL',
+//     tag: 'HILL STATION GETAWAY',
+//     date: '17 Oct - 20 Oct, 2026',
+//     duration: '3 Days / 2 Nights'
+//   },
+//   {
+//     ticketId: 'TRIPINN-KD-02',
+//     name: 'DEEPIKA SUBRAMANIAN',
+//     phone: '+91 90000 00001',
+//     trip: 'KODAIKANAL',
+//     tag: 'HILL STATION GETAWAY',
+//     date: '17 Oct - 20 Oct, 2026',
+//     duration: '3 Days / 2 Nights'
+//   },
+//   {
+//     ticketId: 'TRIPINN-KD-03',
+//     name: 'ARJUN SUBRAMANIAN',
+//     phone: '+91 90000 00001',
+//     trip: 'MUNNAR',
+//     tag: 'HILL STATION GETAWAY',
+//     date: 'Oct 24-26, 2026',
+//     duration: '3 Days / 2 Nights'
+//   },
+//   {
+//     ticketId: 'TRIPINN-KD-04',
+//     name: 'MEERA SUBRAMANIAN',
+//     phone: '+91 90000 00001',
+//     trip: 'MUNNAR',
+//     tag: 'HILL STATION GETAWAY',
+//     date: 'Oct 24-26, 2026',
+//     duration: '3 Days / 2 Nights'
+//   },
+//   {
+//     ticketId: 'TRIPINN-KD-05',
+//     name: 'VIGNESH KUMAR',
+//     phone: '+91 90000 00002',
+//     trip: 'KODAIKANAL',
+//     tag: 'HILL STATION GETAWAY',
+//     date: '17 Oct - 20 Oct, 2026',
+//     duration: '3 Days / 2 Nights'
+//   }
+// ];
 
 // Cache the loaded template image
 let cachedTemplateImage = null;
@@ -414,10 +414,14 @@ async function displayTicket(rawData) {
 // 7. Error & Banner Display Handlers
 
 function showErrorScreen(message) {
+  const portalCard = document.getElementById('portalLandingCard');
+  const ticketStage = document.getElementById('ticketStage');
   const errorContainer = document.getElementById('errorContainer');
   const errorMessageText = document.getElementById('errorMessageText');
   const skeleton = document.getElementById('ticketSkeleton');
 
+  if (portalCard) portalCard.style.display = 'none';
+  if (ticketStage) ticketStage.style.display = 'none';
   if (skeleton) skeleton.style.display = 'none';
 
   if (errorMessageText) {
@@ -625,9 +629,11 @@ async function shareToInstagram() {
 
 async function handleShare() {
   try {
+    if (!currentTicketData) return;
+
     if (!currentTicketBlob) {
       const template = await loadTemplateImage(TICKET_TEMPLATE);
-      const res = await renderTicketCanvas(template, currentTicketData || SAMPLE_TRAVELERS[0]);
+      const res = await renderTicketCanvas(template, currentTicketData);
       currentTicketBlob = res.blob;
     }
 
@@ -776,57 +782,145 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  if (loadSampleBtn) {
-    loadSampleBtn.addEventListener('click', () => {
-      hideErrorScreen();
-      if (previewNotice) previewNotice.style.display = 'flex';
-      displayTicket(SAMPLE_TRAVELERS[0]);
-    });
-  }
+  // Portal Navigation & Mode Switchers
+  function showPortalView() {
+    const portalCard = document.getElementById('portalLandingCard');
+    const ticketStage = document.getElementById('ticketStage');
+    const errorContainer = document.getElementById('errorContainer');
+    const headerStatusPill = document.getElementById('headerStatusPill');
+    const headerStatusText = document.getElementById('headerStatusText');
 
-  if (sampleSelect) {
-    sampleSelect.addEventListener('change', e => {
-      const index = parseInt(e.target.value, 10) || 0;
-      const selected = SAMPLE_TRAVELERS[index] || SAMPLE_TRAVELERS[0];
-      displayTicket(selected);
-    });
-  }
+    if (errorContainer) errorContainer.style.display = 'none';
+    if (ticketStage) ticketStage.style.display = 'none';
+    if (portalCard) portalCard.style.display = 'flex';
 
-  // Determine mode
-  const passParam = getHashParam('pass');
-
-  if (passParam) {
-    if (typeof CryptoJS === 'undefined') {
-      showErrorScreen('Decryption library failed to load. Please check your internet connection and reload.');
-      return;
+    if (headerStatusPill) {
+      headerStatusPill.style.display = 'inline-flex';
+      headerStatusPill.className = 'status-pill portal';
+      const icon = headerStatusPill.querySelector('i');
+      if (icon) icon.className = 'fa-solid fa-shield-halved';
     }
+    if (headerStatusText) {
+      headerStatusText.textContent = 'Official Portal';
+    }
+  }
 
-    const decrypted = decryptData(passParam, SECRET_KEY);
-    if (decrypted) {
-      if (headerStatusPill) {
-        headerStatusPill.className = 'status-pill verified';
+  function showTicketView() {
+    const portalCard = document.getElementById('portalLandingCard');
+    const ticketStage = document.getElementById('ticketStage');
+    const errorContainer = document.getElementById('errorContainer');
+    const headerStatusPill = document.getElementById('headerStatusPill');
+    const headerStatusText = document.getElementById('headerStatusText');
+
+    if (portalCard) portalCard.style.display = 'none';
+    if (errorContainer) errorContainer.style.display = 'none';
+    if (ticketStage) ticketStage.style.display = 'flex';
+
+    if (headerStatusPill) {
+      headerStatusPill.style.display = 'inline-flex';
+      headerStatusPill.className = 'status-pill verified';
+      const icon = headerStatusPill.querySelector('i');
+      if (icon) icon.className = 'fa-solid fa-circle-check';
+    }
+    if (headerStatusText) {
+      headerStatusText.textContent = 'Verified Boarding Pass';
+    }
+  }
+
+  function initPassFromHash() {
+    const passParam = getHashParam('pass');
+
+    if (passParam) {
+      if (typeof CryptoJS === 'undefined') {
+        showErrorScreen('Decryption library failed to load. Please check your internet connection and reload.');
+        return;
       }
-      if (headerStatusText) {
-        headerStatusText.textContent = 'Verified Boarding Pass';
+
+      const decrypted = decryptData(passParam, SECRET_KEY);
+      if (decrypted) {
+        showTicketView();
+        displayTicket(decrypted);
+      } else {
+        if (headerStatusPill) headerStatusPill.style.display = 'none';
+        showErrorScreen('The ticket link provided could not be decrypted or has expired. Please check your link.');
       }
-      displayTicket(decrypted);
-      return;
     } else {
-      showErrorScreen('The ticket link provided could not be decrypted or has expired. Please check your link.');
-      return;
+      showPortalView();
     }
   }
 
-  // Default / Preview mode
-  if (previewNotice) {
-    previewNotice.style.display = 'flex';
-  }
-  if (headerStatusPill) {
-    headerStatusPill.className = 'status-pill preview';
-  }
-  if (headerStatusText) {
-    headerStatusText.textContent = 'Sample Preview';
+  // Portal Lookup Controls
+  const lookupPassBtn = document.getElementById('lookupPassBtn');
+  const passLinkInput = document.getElementById('passLinkInput');
+  const lookupError = document.getElementById('lookupError');
+  const backToPortalBtn = document.getElementById('backToPortalBtn');
+  const returnToPortalBtn = document.getElementById('returnToPortalBtn');
+
+  function handlePassLookup() {
+    if (!passLinkInput) return;
+    const rawVal = (passLinkInput.value || '').trim();
+    if (!rawVal) {
+      if (lookupError) {
+        lookupError.textContent = 'Please enter or paste your booking link or pass token.';
+        lookupError.style.display = 'block';
+      }
+      return;
+    }
+
+    const match = rawVal.match(/pass=([^&#]+)/);
+    const token = match ? match[1] : rawVal;
+
+    if (typeof CryptoJS === 'undefined') {
+      if (lookupError) {
+        lookupError.textContent = 'Decryption library is loading, please try again in a second.';
+        lookupError.style.display = 'block';
+      }
+      return;
+    }
+
+    const decrypted = decryptData(token, SECRET_KEY);
+    if (decrypted) {
+      if (lookupError) lookupError.style.display = 'none';
+      window.location.hash = '#pass=' + token;
+      showTicketView();
+      displayTicket(decrypted);
+    } else {
+      if (lookupError) {
+        lookupError.textContent = 'Invalid ticket token. Please paste the full link sent by TripInn Holidays.';
+        lookupError.style.display = 'block';
+      }
+    }
   }
 
-  displayTicket(SAMPLE_TRAVELERS[0]);
+  if (lookupPassBtn) lookupPassBtn.addEventListener('click', handlePassLookup);
+  if (passLinkInput) {
+    passLinkInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handlePassLookup();
+      }
+    });
+    passLinkInput.addEventListener('input', () => {
+      if (lookupError) lookupError.style.display = 'none';
+    });
+  }
+
+  if (backToPortalBtn) {
+    backToPortalBtn.addEventListener('click', () => {
+      history.pushState('', document.title, window.location.pathname + window.location.search);
+      showPortalView();
+    });
+  }
+
+  if (returnToPortalBtn) {
+    returnToPortalBtn.addEventListener('click', () => {
+      history.pushState('', document.title, window.location.pathname + window.location.search);
+      showPortalView();
+    });
+  }
+
+  window.addEventListener('hashchange', initPassFromHash);
+
+  // Initialize view based on current hash
+  initPassFromHash();
 });

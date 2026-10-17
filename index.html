@@ -9,6 +9,8 @@
   <!-- Google Fonts: Inter & Oswald -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="icon" href="icon.png" />
+  <link rel="icon" href="icon.png" type="image/x-icon" />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap"
     rel="stylesheet" />
@@ -29,16 +31,90 @@
     <!-- Top Announcement / Mode Banner -->
     <header class="app-header">
       <div class="brand-pill">
-        <i class="fa-solid fa-plane-departure brand-icon"></i>
+        <img src="icon.png" alt="TripInn Holidays Logo" class="brand-logo-img" />
         <span>TripInn Holidays</span>
       </div>
-      <div class="status-pill" id="headerStatusPill">
-        <i class="fa-solid fa-circle-check"></i>
-        <span id="headerStatusText">Verified Boarding Pass</span>
+      <div class="status-pill portal" id="headerStatusPill">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span id="headerStatusText">Official Portal</span>
       </div>
     </header>
 
-    <!-- Error Message Banner (Hidden by default) -->
+
+
+    <!-- Direct Portal Landing View (Shown when visiting direct index.html without a pass) -->
+    <div class="portal-landing-card" id="portalLandingCard" style="display: none;">
+      <!-- Hero Top Branding & Badge -->
+      <div class="portal-hero">
+        <div class="portal-badge">
+          <i class="fa-solid fa-plane-departure"></i>
+          <span>Official Digital Travel Portal</span>
+        </div>
+        <h1 class="portal-title">TripInn Holidays</h1>
+        <p class="portal-tagline">
+          Boutique Hill Station Getaways & Group Expeditions
+        </p>
+      </div>
+
+      <!-- Information Notice Banner -->
+      <div class="portal-notice-card">
+        <div class="notice-icon-box">
+          <i class="fa-solid fa-ticket"></i>
+        </div>
+        <div class="notice-content">
+          <h3>Personal Boarding Passes</h3>
+          <p>
+            Boarding passes are personalized for each confirmed traveler with verified barcodes, seat numbers, and coach pickup details. Please click your personal link sent via WhatsApp / SMS, or paste it below.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Pass Lookup / Direct Opener Box -->
+      <div class="portal-lookup-section">
+        <label for="passLinkInput" class="lookup-label">Have your booking link or pass token?</label>
+        <div class="pass-lookup-box">
+          <div class="lookup-input-wrapper">
+            <i class="fa-solid fa-link lookup-icon"></i>
+            <input type="text" id="passLinkInput" placeholder="Paste your ticket link or pass token here..." autocomplete="off" />
+          </div>
+          <button type="button" id="lookupPassBtn" class="btn-lookup">
+            <span>Open Pass</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+        <p class="lookup-error" id="lookupError" style="display: none;"></p>
+      </div>
+
+      <!-- Website Redirection Banner -->
+      <div class="portal-website-card">
+        <div class="website-card-content">
+          <div class="website-icon-box">
+            <i class="fa-solid fa-globe"></i>
+          </div>
+          <div class="website-text">
+            <strong>Explore Our Tour Packages</strong>
+            <span>Looking for upcoming hill station trips, itineraries, or new bookings? Visit our official website.</span>
+          </div>
+        </div>
+        <a href="https://www.tripinnholidays.com" target="_blank" rel="noopener noreferrer" class="btn-visit-website">
+          <span>Go to tripinnholidays.com</span>
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+      </div>
+
+      <!-- Customer Support Strip -->
+      <div class="portal-support-strip">
+        <div class="support-text">
+          <span>Need help finding your pass or booking confirmation?</span>
+        </div>
+        <a href="https://wa.me/919092613147?text=Hi%20TripInn%20Holidays%2C%20I%20would%20like%20to%20get%20my%20boarding%20pass" target="_blank" class="btn-whatsapp-support">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span>TripInn Support</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Error Message Banner (Shown on invalid token or decryption failure) -->
     <div class="error-container" id="errorContainer" style="display: none;" role="alert">
       <div class="error-card">
         <div class="error-icon-box">
@@ -47,38 +123,19 @@
         <div class="error-content">
           <h2 class="error-title">Unable to Verify Pass Link</h2>
           <p class="error-desc" id="errorMessageText">
-            The ticket link provided is invalid or incomplete. Please verify the URL received in your booking
-            confirmation.
+            The ticket link provided is invalid or has expired.
           </p>
           <div class="error-actions">
-            <button type="button" class="btn-secondary" id="loadSampleBtn">
-              <i class="fa-solid fa-eye"></i> View Sample Ticket Preview
+            <button type="button" class="btn-secondary" id="returnToPortalBtn">
+              <i class="fa-solid fa-house"></i> Return to Portal
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Preview Mode Notice -->
-    <div class="preview-banner" id="previewNotice" style="display: none;" role="status">
-      <div class="preview-banner-content">
-        <i class="fa-solid fa-flask"></i>
-        <span><strong>Preview Mode</strong> — Sample traveler data shown below.</span>
-      </div>
-      <div class="preview-controls">
-        <label for="sampleTravelerSelect">Select Passenger:</label>
-        <select id="sampleTravelerSelect" class="sample-select" aria-label="Select sample traveler">
-          <option value="0">Karthik Subramanian (TRIPINN-KD-01 - Kodaikanal)</option>
-          <option value="1">Deepika Subramanian (TRIPINN-KD-02 - Kodaikanal)</option>
-          <option value="2">Arjun Subramanian (TRIPINN-KD-03 - Munnar)</option>
-          <option value="3">Meera Subramanian (TRIPINN-KD-04 - Munnar)</option>
-          <option value="4">Vignesh Kumar (TRIPINN-KD-05 - Kodaikanal)</option>
-        </select>
-      </div>
-    </div>
-
     <!-- Main Ticket Display Stage -->
-    <main class="ticket-stage" id="ticketStage">
+    <main class="ticket-stage" id="ticketStage" style="display: none;">
       <!-- Loading Skeleton Indicator -->
       <div class="ticket-skeleton" id="ticketSkeleton">
         <div class="skeleton-shimmer"></div>
@@ -106,6 +163,11 @@
             <i class="fa-solid fa-circle-notch fa-spin spinner-icon"></i>
           </span>
           <span class="btn-text">Download Ticket (PNG)</span>
+        </button>
+
+        <button type="button" class="btn-text-link" id="backToPortalBtn">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Return to Portal</span>
         </button>
       </section>
 
