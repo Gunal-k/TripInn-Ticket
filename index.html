@@ -3,16 +3,27 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TripInn Holidays — Digital Travel Pass</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <title>TripInn Holidays — Official Digital Travel Pass</title>
 
-  <!-- Google Fonts: Inter & Oswald -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- iOS Web App & Meta Configuration -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TripInn Pass" />
+  <meta name="theme-color" content="#070b14" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="description" content="Official Digital Travel Pass portal for TripInn Holidays hill station expeditions. View, download, and verify your boarding pass." />
+
+  <!-- Icons -->
   <link rel="icon" href="icon.png" />
   <link rel="icon" href="icon.png" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="icon.png" />
+
+  <!-- Google Fonts: Inter (Optically sized modern sans-serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet" />
 
   <!-- Font Awesome Icons -->
@@ -27,94 +38,151 @@
 </head>
 
 <body>
+  <!-- Dynamic Island / Apple Capsule Toast Notification -->
+  <div class="dynamic-toast-capsule" id="appToast" role="status" aria-live="polite">
+    <div class="dynamic-toast-content">
+      <i class="fa-solid fa-circle-check toast-icon"></i>
+      <span class="toast-message">Ready</span>
+    </div>
+  </div>
+
   <div class="app-layout">
-    <!-- Top Announcement / Mode Banner -->
+    <!-- Apple Translucent Glass Navigation Bar -->
     <header class="app-header">
-      <div class="brand-pill">
+      <div class="brand-pill" id="headerBrandHome">
         <img src="icon.png" alt="TripInn Holidays Logo" class="brand-logo-img" />
-        <span>TripInn Holidays</span>
+        <span class="brand-title">TripInn Holidays</span>
       </div>
       <div class="status-pill portal" id="headerStatusPill">
-        <i class="fa-solid fa-shield-halved"></i>
+        <span class="status-indicator-dot"></span>
         <span id="headerStatusText">Official Portal</span>
       </div>
     </header>
 
-
-
-    <!-- Direct Portal Landing View (Shown when visiting direct index.html without a pass) -->
+    <!-- ======================================================================
+         1. Direct Portal Landing View (Shown without pass parameter in URL)
+         ====================================================================== -->
     <div class="portal-landing-card" id="portalLandingCard" style="display: none;">
       <!-- Hero Top Branding & Badge -->
       <div class="portal-hero">
         <div class="portal-badge">
           <i class="fa-solid fa-plane-departure"></i>
-          <span>Official Digital Travel Portal</span>
+          <span>Official Travel Pass Portal</span>
         </div>
         <h1 class="portal-title">TripInn Holidays</h1>
         <p class="portal-tagline">
-          Boutique Hill Station Getaways & Group Expeditions
+          Boutique Hill Station Getaways & Verified Boarding Passes
         </p>
-      </div>
-
-      <!-- Information Notice Banner -->
-      <div class="portal-notice-card">
-        <div class="notice-icon-box">
-          <i class="fa-solid fa-ticket"></i>
-        </div>
-        <div class="notice-content">
-          <h3>Personal Boarding Passes</h3>
-          <p>
-            Boarding passes are personalized for each confirmed traveler with verified barcodes, seat numbers, and coach pickup details. Please click your personal link sent via WhatsApp / SMS, or paste it below.
-          </p>
-        </div>
       </div>
 
       <!-- Quick Pass Lookup / Direct Opener Box -->
       <div class="portal-lookup-section">
-        <label for="passLinkInput" class="lookup-label">Have your booking link or pass token?</label>
+        <label for="passLinkInput" class="lookup-label">Enter your booking link or pass token</label>
         <div class="pass-lookup-box">
           <div class="lookup-input-wrapper">
             <i class="fa-solid fa-link lookup-icon"></i>
-            <input type="text" id="passLinkInput" placeholder="Paste your ticket link or pass token here..." autocomplete="off" />
+            <input type="text" id="passLinkInput" placeholder="Paste booking link or token..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </div>
+          <button type="button" class="btn-input-clear" id="clearPassBtn" style="display: none;" title="Clear input">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </button>
+          <button type="button" class="btn-paste" id="pastePassBtn" title="Paste from clipboard">
+            <i class="fa-regular fa-paste"></i>
+            <span>Paste</span>
+          </button>
           <button type="button" id="lookupPassBtn" class="btn-lookup">
-            <span>Open Pass</span>
+            <span>Open</span>
             <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
         <p class="lookup-error" id="lookupError" style="display: none;"></p>
       </div>
 
-      <!-- Website Redirection Banner -->
-      <div class="portal-website-card">
-        <div class="website-card-content">
-          <div class="website-icon-box">
-            <i class="fa-solid fa-globe"></i>
-          </div>
-          <div class="website-text">
-            <strong>Explore Our Tour Packages</strong>
-            <span>Looking for upcoming hill station trips, itineraries, or new bookings? Visit our official website.</span>
-          </div>
+      <!-- Quick Sample Passes (Horizontal Apple-style Chip Selector) -->
+      <div class="sample-passes-section">
+        <div class="sample-section-header">
+          <span class="sample-label">Or preview sample traveler pass:</span>
         </div>
-        <a href="https://www.tripinnholidays.com" target="_blank" rel="noopener noreferrer" class="btn-visit-website">
-          <span>Go to tripinnholidays.com</span>
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>
+        <div class="sample-chips-row">
+          <button type="button" class="sample-chip" data-token="U2FsdGVkX19a6%2Bnawe2o7w2P0Bb2lqdho0FpBjhyqfuAoJLWw82HaFUeaAUHJbKvgW%2FRUtNh1ZkqYdwNbvWUctKGnQRBgpy%2F7e6jCW%2BMFg%2FTXRpCmYO5IT0%2B7pIUjIn7NBw2oQvL05VBu3NKeIdN8dGkw1wZ7H8r6xmMesgWkyzAEAlRMmZyMgjug7zaa5j2">
+            <span class="chip-avatar munnar"><i class="fa-solid fa-mountain"></i></span>
+            <div class="chip-info">
+              <strong>Janani</strong>
+              <span>Munnar Pass</span>
+            </div>
+          </button>
+
+          <button type="button" class="sample-chip" data-token="U2FsdGVkX19ZCqlzq02JrWJNYWqAns9ZMKeu0MeUVo9dMaXgEz20UturNrWc7U14k2P5ceMa1t0y5byvr8g%2F8Lk9TokdlAquVzYggHAveW798rNQyUAkmR2dPLnpVauD9xVTziUcWCnMxfiPvo31TQqHk2bGFgwYazhcWREZnp5Ppf5ZSAO9MS%2Bdhhm7qYL4">
+            <span class="chip-avatar kodai"><i class="fa-solid fa-tree"></i></span>
+            <div class="chip-info">
+              <strong>Madhumitha</strong>
+              <span>Kodaikanal Pass</span>
+            </div>
+          </button>
+
+          <button type="button" class="sample-chip" data-token="U2FsdGVkX18UeqbZGQOOF8cClLeFupuhLw2YoXZCKyhyqGuZrc2L3nmbw20Udm5lXhUBfJrhO6K8ge4USi4q77KTLfPlZxP5Mju6ZRM2rQc6RODMjZckS%2Bhbosg0vCTTG0uFu28qaYY4kGfix%2BC5KoR%2BqtDUuRLqXCaHw3bH6CMGTvpewZcFdRmk0Nb5nu5A">
+            <span class="chip-avatar munnar"><i class="fa-solid fa-mountain"></i></span>
+            <div class="chip-info">
+              <strong>Vignesh</strong>
+              <span>Munnar Pass</span>
+            </div>
+          </button>
+
+          <button type="button" class="sample-chip" data-token="U2FsdGVkX19zftKvmm1cBn%2FwP1f8QupuNdP%2By7pS0JTNADkOWw3wdTDwmwT1wJooRZmegSZeDQdkPtjPpTU6TZNsLW2LWYECo1IiUKgwPhDSoVx4tn6E0n96cXiFOPiM2Yj1vfTH%2BKumbBUAgQhGUJCE4LPvAucOnupxhYI1D0qFrHXzMm8vNoNiOpOvAaLP">
+            <span class="chip-avatar kodai"><i class="fa-solid fa-tree"></i></span>
+            <div class="chip-info">
+              <strong>Ravi Kumar</strong>
+              <span>Kodaikanal Pass</span>
+            </div>
+          </button>
+        </div>
       </div>
 
-      <!-- Customer Support Strip -->
-      <div class="portal-support-strip">
-        <div class="support-text">
-          <span>Need help finding your pass or booking confirmation?</span>
+      <!-- Apple Inset Grouped Navigation Cards -->
+      <div class="apple-grouped-card">
+        <div class="grouped-section-title">TOUR & CONCIERGE ASSISTANCE</div>
+        <div class="grouped-list">
+          <!-- Website Link Row -->
+          <a href="https://www.tripinnholidays.com" target="_blank" rel="noopener noreferrer" class="grouped-item">
+            <div class="grouped-item-icon website">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <div class="grouped-item-content">
+              <strong>Explore Tour Packages</strong>
+              <span>Hill station itineraries, hotel stays & bookings</span>
+            </div>
+            <i class="fa-solid fa-chevron-right grouped-chevron"></i>
+          </a>
+
+          <!-- WhatsApp Concierge Row -->
+          <a href="https://wa.me/919092613147?text=Hi%20TripInn%20Holidays%2C%20I%20would%20like%20to%20get%20my%20boarding%20pass" target="_blank" rel="noopener noreferrer" class="grouped-item">
+            <div class="grouped-item-icon whatsapp">
+              <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <div class="grouped-item-content">
+              <strong>TripInn Concierge Support</strong>
+              <span>Instant WhatsApp verification & booking support</span>
+            </div>
+            <i class="fa-solid fa-chevron-right grouped-chevron"></i>
+          </a>
+
+          <!-- Security Badge Row -->
+          <div class="grouped-item static">
+            <div class="grouped-item-icon shield">
+              <i class="fa-solid fa-shield-check"></i>
+            </div>
+            <div class="grouped-item-content">
+              <strong>Cryptographic Verification</strong>
+              <span>Passes are end-to-end encrypted with verified barcodes</span>
+            </div>
+          </div>
         </div>
-        <a href="https://wa.me/919092613147?text=Hi%20TripInn%20Holidays%2C%20I%20would%20like%20to%20get%20my%20boarding%20pass" target="_blank" class="btn-whatsapp-support">
-          <i class="fa-brands fa-whatsapp"></i>
-          <span>TripInn Support</span>
-        </a>
       </div>
     </div>
 
-    <!-- Error Message Banner (Shown on invalid token or decryption failure) -->
+    <!-- ======================================================================
+         2. Error Container (Shown on invalid or corrupted link)
+         ====================================================================== -->
     <div class="error-container" id="errorContainer" style="display: none;" role="alert">
       <div class="error-card">
         <div class="error-icon-box">
@@ -134,7 +202,9 @@
       </div>
     </div>
 
-    <!-- Main Ticket Display Stage -->
+    <!-- ======================================================================
+         3. Main Ticket Display Stage (Apple Wallet Pass View)
+         ====================================================================== -->
     <main class="ticket-stage" id="ticketStage" style="display: none;">
       <!-- Loading Skeleton Indicator -->
       <div class="ticket-skeleton" id="ticketSkeleton">
@@ -147,38 +217,286 @@
 
       <!-- Ticket Canvas Presentation Frame -->
       <div class="ticket-card-wrapper" id="ticketCardWrapper" style="display: none;">
-        <div class="ticket-elevation-shadow"></div>
+        <!-- Top Pass Verification Pill -->
+        <div class="pass-verified-pill">
+          <span class="verified-dot"></span>
+          <span>Verified Digital Boarding Pass</span>
+        </div>
+
         <div class="ticket-frame">
           <img id="ticketDisplayImage" class="ticket-render-image" alt="TripInn Holidays Travel Pass" width="1024"
             height="1536" />
         </div>
       </div>
 
-      <!-- Action Panel -->
+      <!-- Sub-caption tip for mobile touch -->
+      <p class="ticket-caption" id="ticketCaption" style="display: none;">
+        <i class="fa-regular fa-hand-pointer"></i>
+        <span>Touch & hold ticket image to save directly to Photos.</span>
+      </p>
+
+      <!-- Apple Inset Grouped Pass Details Card -->
+      <div class="pass-details-card" id="passDetailsCard" style="display: none;">
+        <div class="grouped-section-title">BOARDING PASS DETAILS</div>
+        <div class="grouped-list">
+          <div class="pass-info-row">
+            <div class="pass-info-label">
+              <i class="fa-solid fa-user"></i>
+              <span>Traveler</span>
+            </div>
+            <strong class="pass-info-value" id="passDetailTraveler">—</strong>
+          </div>
+
+          <div class="pass-info-row">
+            <div class="pass-info-label">
+              <i class="fa-solid fa-mountain-sun"></i>
+              <span>Destination</span>
+            </div>
+            <strong class="pass-info-value" id="passDetailTrip">—</strong>
+          </div>
+
+          <div class="pass-info-row">
+            <div class="pass-info-label">
+              <i class="fa-solid fa-calendar-days"></i>
+              <span>Travel Dates</span>
+            </div>
+            <div class="pass-info-value-block">
+              <strong id="passDetailDate">—</strong>
+              <span id="passDetailDuration" class="pass-info-sub">—</span>
+            </div>
+          </div>
+
+          <div class="pass-info-row">
+            <div class="pass-info-label">
+              <i class="fa-solid fa-ticket"></i>
+              <span>Ticket ID</span>
+            </div>
+            <div class="pass-info-action-value">
+              <code id="passDetailId" class="ticket-id-badge">—</code>
+              <button type="button" class="btn-mini-copy" id="copyTicketIdBtn" title="Copy Ticket ID">
+                <i class="fa-regular fa-copy"></i>
+                <span>Copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="pass-info-row">
+            <div class="pass-info-label">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Status</span>
+            </div>
+            <div class="pass-status-tag">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Confirmed • Show at Coach</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary Action Panel (Docked for Thumb Reachability on Mobile) -->
       <section class="actions-panel" id="actionsPanel" style="display: none;">
-        <button class="btn-primary btn-download" id="downloadTrigger" type="button"
-          aria-label="Download ticket as PNG image">
-          <span class="btn-icon-wrapper">
-            <i class="fa-solid fa-arrow-down-to-bracket download-icon"></i>
-            <i class="fa-solid fa-circle-notch fa-spin spinner-icon"></i>
-          </span>
-          <span class="btn-text">Download Ticket (PNG)</span>
-        </button>
+        <div class="actions-buttons-row">
+          <button class="btn-primary btn-download" id="downloadTrigger" type="button"
+            aria-label="Download ticket as PNG image">
+            <span class="btn-icon-wrapper">
+              <i class="fa-solid fa-arrow-down-to-bracket download-icon"></i>
+              <i class="fa-solid fa-circle-notch fa-spin spinner-icon"></i>
+            </span>
+            <span class="btn-text">Download Ticket (PNG)</span>
+          </button>
+
+          <button class="btn-secondary btn-share" id="shareTrigger" type="button"
+            aria-label="Share ticket">
+            <i class="fa-solid fa-arrow-up-from-bracket share-icon"></i>
+            <span class="btn-text">Share</span>
+          </button>
+        </div>
 
         <button type="button" class="btn-text-link" id="backToPortalBtn">
-          <i class="fa-solid fa-arrow-left"></i>
+          <i class="fa-solid fa-chevron-left"></i>
           <span>Return to Portal</span>
         </button>
       </section>
-
-      <!-- Sub-caption tip for mobile touch -->
-      <p class="ticket-caption" id="ticketCaption" style="display: none;">
-        <span>Tip: On mobile, you can also press and hold the ticket image to share or save to photos.</span>
-      </p>
     </main>
 
     <!-- Hidden canvas for rendering and export -->
     <canvas id="offscreenTicketCanvas" style="display: none;"></canvas>
+  </div>
+
+  <!-- ======================================================================
+       4. Apple iOS Style Bottom Sheet Modal for Sharing
+       ====================================================================== -->
+  <div class="share-modal-overlay" id="shareModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="shareSheetTitle">
+    <div class="share-modal-card">
+      <!-- iOS Drag Grabber Bar -->
+      <div class="sheet-grabber"></div>
+
+      <!-- Modal Header -->
+      <div class="share-modal-header">
+        <div class="share-modal-title-box">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+          <span id="shareSheetTitle">Share Travel Pass</span>
+        </div>
+        <button type="button" class="btn-close-modal" id="closeShareModal" aria-label="Close share sheet">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- View 1: Main Options List (Apple Inset Grouped Actions) -->
+      <div class="share-view" id="shareMainView">
+        <div class="share-options-grouped">
+          <button type="button" class="share-option-btn" id="shareWhatsAppBtn">
+            <div class="share-option-icon whatsapp-opt-icon">
+              <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <div class="share-option-info">
+              <strong>Share to WhatsApp</strong>
+              <span>Send directly to chat or contact</span>
+            </div>
+            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+          </button>
+
+          <button type="button" class="share-option-btn" id="shareInstagramBtn">
+            <div class="share-option-icon instagram-opt-icon">
+              <i class="fa-brands fa-instagram"></i>
+            </div>
+            <div class="share-option-info">
+              <strong>Share to Instagram Story</strong>
+              <span>Post to your story or direct message</span>
+            </div>
+            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+          </button>
+
+          <button type="button" class="share-option-btn" id="savePhotosBtn">
+            <div class="share-option-icon photos-opt-icon">
+              <i class="fa-solid fa-image"></i>
+            </div>
+            <div class="share-option-info">
+              <strong>Save to Photos</strong>
+              <span>Download high-resolution PNG image</span>
+            </div>
+            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+          </button>
+
+          <button type="button" class="share-option-btn" id="copyLinkBtn">
+            <div class="share-option-icon link-opt-icon">
+              <i class="fa-solid fa-link"></i>
+            </div>
+            <div class="share-option-info">
+              <strong>Copy Pass Link</strong>
+              <span>Copy encrypted link for easy sharing</span>
+            </div>
+            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+          </button>
+
+          <button type="button" class="share-option-btn" id="copyImageBtn">
+            <div class="share-option-icon copy-opt-icon">
+              <i class="fa-regular fa-copy"></i>
+            </div>
+            <div class="share-option-info">
+              <strong>Copy Image to Clipboard</strong>
+              <span>Paste directly into chats or documents</span>
+            </div>
+            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- View 2: WhatsApp Step-by-Step Guide -->
+      <div class="share-view" id="shareWhatsAppView" style="display: none;">
+        <div class="guide-header">
+          <div class="guide-badge whatsapp">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>WhatsApp Sharing</span>
+          </div>
+        </div>
+        <p class="guide-intro">Your pass image has been copied to your clipboard. Paste it directly in any WhatsApp chat.</p>
+
+        <div class="guide-content-box">
+          <div class="guide-step">
+            <div class="step-num">1</div>
+            <div class="step-text">
+              <strong>Open WhatsApp Chat</strong>
+              <p>Click below to open WhatsApp app or web.</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="step-num">2</div>
+            <div class="step-text">
+              <strong>Paste & Send</strong>
+              <p>Press <span class="kbd-key">Ctrl + V</span> or tap <strong>Paste</strong> to send your ticket.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-actions">
+          <a id="openWhatsAppDirectBtn" href="https://web.whatsapp.com" target="_blank" rel="noopener noreferrer" class="btn-primary btn-wa">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>Open WhatsApp</span>
+          </a>
+          <button type="button" class="btn-secondary" id="recopyWaBtn">
+            <i class="fa-regular fa-copy"></i>
+            <span>Re-copy Ticket Image</span>
+          </button>
+          <button type="button" class="btn-back-link" id="backFromWaBtn">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to share options</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- View 3: Instagram Guide with QR Code -->
+      <div class="share-view" id="shareInstagramView" style="display: none;">
+        <div class="guide-header">
+          <div class="guide-badge instagram">
+            <i class="fa-brands fa-instagram"></i>
+            <span>Instagram Story</span>
+          </div>
+        </div>
+
+        <div class="qr-code-card">
+          <img id="qrCodeImg" class="qr-image" src="" alt="Scan with mobile camera to share on Instagram" />
+          <span class="qr-hint">Scan with phone camera</span>
+        </div>
+
+        <div class="guide-content-box">
+          <div class="guide-step">
+            <div class="step-num">1</div>
+            <div class="step-text">
+              <strong>Save or Copy Pass</strong>
+              <p>Save pass image or scan the QR code above with your mobile device.</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="step-num">2</div>
+            <div class="step-text">
+              <strong>Open Instagram & Story</strong>
+              <p>Tap Your Story → Add photo from camera roll and tag <strong>@tripinnholidays</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-actions">
+          <button type="button" class="btn-primary btn-insta" id="saveForInstaBtn">
+            <i class="fa-solid fa-download"></i>
+            <span>Save Ticket for Story</span>
+          </button>
+          <button type="button" class="btn-secondary" id="copyForInstaBtn">
+            <i class="fa-regular fa-copy"></i>
+            <span>Copy Image</span>
+          </button>
+          <button type="button" class="btn-back-link" id="backFromInstaBtn">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to share options</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cancel Pill Button (iOS bottom sheet standard) -->
+      <button type="button" class="btn-sheet-cancel" id="cancelShareSheetBtn">
+        Cancel
+      </button>
+    </div>
   </div>
 
   <!-- Ticket Application Controller Script -->

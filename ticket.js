@@ -1,68 +1,22 @@
 /**
  * TripInn Holidays — Digital Travel Pass Controller
+ * Apple Design System & Mobile-First Implementation
  * Renders traveler details onto Template_bg.png (1024 × 1536 px)
- * Displays the ticket immediately on load, and enables instant PNG download.
+ * Displays the ticket immediately on load, and enables instant PNG download & native sharing.
  */
 
 const SECRET_KEY = 'tripinn-super-secret-key-2026';
 const TICKET_TEMPLATE = 'Template_bg.png';
 
-// Sample travelers for preview / fallback mode
-// const SAMPLE_TRAVELERS = [
-//   {
-//     ticketId: 'TRIPINN-KD-01',
-//     name: 'KARTHIK SUBRAMANIAN',
-//     phone: '+91 90000 00001',
-//     trip: 'KODAIKANAL',
-//     tag: 'HILL STATION GETAWAY',
-//     date: '17 Oct - 20 Oct, 2026',
-//     duration: '3 Days / 2 Nights'
-//   },
-//   {
-//     ticketId: 'TRIPINN-KD-02',
-//     name: 'DEEPIKA SUBRAMANIAN',
-//     phone: '+91 90000 00001',
-//     trip: 'KODAIKANAL',
-//     tag: 'HILL STATION GETAWAY',
-//     date: '17 Oct - 20 Oct, 2026',
-//     duration: '3 Days / 2 Nights'
-//   },
-//   {
-//     ticketId: 'TRIPINN-KD-03',
-//     name: 'ARJUN SUBRAMANIAN',
-//     phone: '+91 90000 00001',
-//     trip: 'MUNNAR',
-//     tag: 'HILL STATION GETAWAY',
-//     date: 'Oct 24-26, 2026',
-//     duration: '3 Days / 2 Nights'
-//   },
-//   {
-//     ticketId: 'TRIPINN-KD-04',
-//     name: 'MEERA SUBRAMANIAN',
-//     phone: '+91 90000 00001',
-//     trip: 'MUNNAR',
-//     tag: 'HILL STATION GETAWAY',
-//     date: 'Oct 24-26, 2026',
-//     duration: '3 Days / 2 Nights'
-//   },
-//   {
-//     ticketId: 'TRIPINN-KD-05',
-//     name: 'VIGNESH KUMAR',
-//     phone: '+91 90000 00002',
-//     trip: 'KODAIKANAL',
-//     tag: 'HILL STATION GETAWAY',
-//     date: '17 Oct - 20 Oct, 2026',
-//     duration: '3 Days / 2 Nights'
-//   }
-// ];
-
-// Cache the loaded template image
+// Cache loaded template image and current state
 let cachedTemplateImage = null;
 let currentTicketBlob = null;
 let currentTicketData = null;
 let isExporting = false;
 
+// ============================================================================
 // 1. Read and Decrypt Ticket Link
+// ============================================================================
 
 function getHashParam(key) {
   const hash = window.location.hash.substring(1);
@@ -98,7 +52,9 @@ function decryptData(cipher, key) {
   return null;
 }
 
-// 2. Data Normalization Helper (Supports both compact and expanded payload keys)
+// ============================================================================
+// 2. Data Normalization Helper
+// ============================================================================
 
 function isDateString(str) {
   if (!str) return false;
@@ -168,7 +124,9 @@ function normalizeTicketData(raw) {
   return { name, ticketId, phone, trip, date, duration, tag };
 }
 
+// ============================================================================
 // 3. Load Template Asset
+// ============================================================================
 
 function loadTemplateImage(src) {
   if (cachedTemplateImage) {
@@ -192,9 +150,11 @@ function loadTemplateImage(src) {
   });
 }
 
+// ============================================================================
 // 4. Typography Helpers
+// ============================================================================
 
-function drawFittedText(context, text, x, baselineY, maxWidth, initialSize, weight = '700', fontName = 'Inter, sans-serif') {
+function drawFittedText(context, text, x, baselineY, maxWidth, initialSize, weight = '700', fontName = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif') {
   const value = String(text || '').trim();
   let size = initialSize;
 
@@ -209,7 +169,9 @@ function drawFittedText(context, text, x, baselineY, maxWidth, initialSize, weig
   return size;
 }
 
-// 5. Core Ticket Renderer (Matches Target Look)
+// ============================================================================
+// 5. Core Ticket Renderer
+// ============================================================================
 
 async function renderTicketCanvas(template, rawData) {
   const data = normalizeTicketData(rawData);
@@ -227,12 +189,12 @@ async function renderTicketCanvas(template, rawData) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 
-  // 5B. Destination & Pill
+  // 5B. Destination & Tag Pill
   ctx.save();
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#ffffff';
-  ctx.font = '900 52px Inter, sans-serif';
+  ctx.font = '900 52px -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif';
   ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
   ctx.shadowBlur = 10;
   ctx.shadowOffsetX = 1;
@@ -243,7 +205,7 @@ async function renderTicketCanvas(template, rawData) {
   const rawTrip = String(data.trip || 'KODAIKANAL').trim();
   const destName = rawTrip.replace(/\s*\([^)]*\)/, '').trim().toUpperCase();
 
-  drawFittedText(ctx, destName, destX, destY, 650, 52, '900', 'Inter, sans-serif');
+  drawFittedText(ctx, destName, destX, destY, 650, 52, '900', '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif');
 
   // Pill badge below destination
   ctx.shadowColor = 'transparent';
@@ -256,7 +218,7 @@ async function renderTicketCanvas(template, rawData) {
      'VACATION GETAWAY')
   ).toUpperCase();
 
-  ctx.font = '700 13px Inter, sans-serif';
+  ctx.font = '700 13px -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
   const textWidth = ctx.measureText(pillText).width;
   const pillPaddingX = 22;
   const pillWidth = textWidth + pillPaddingX * 2;
@@ -285,7 +247,7 @@ async function renderTicketCanvas(template, rawData) {
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#111827';
   const customerName = String(data.name || 'KARTHIK SUBRAMANIAN').trim().toUpperCase();
-  drawFittedText(ctx, customerName, 285, 736, 580, 34, '800', 'Inter, sans-serif');
+  drawFittedText(ctx, customerName, 285, 736, 580, 34, '800', '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif');
   ctx.restore();
 
   // 5D. Travel Dates & Duration
@@ -294,7 +256,7 @@ async function renderTicketCanvas(template, rawData) {
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#111827';
   const travelDates = String(data.date || '17 Oct - 20 Oct, 2026').trim();
-  drawFittedText(ctx, travelDates, 285, 846, 580, 30, '800', 'Inter, sans-serif');
+  drawFittedText(ctx, travelDates, 285, 846, 580, 30, '800', '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif');
 
   // Subtitle duration in parenthesis
   let durationStr = data.duration || '';
@@ -306,7 +268,7 @@ async function renderTicketCanvas(template, rawData) {
   if (!durationStr.startsWith('(')) durationStr = `(${durationStr})`;
 
   ctx.fillStyle = '#475569';
-  ctx.font = '500 20px Inter, sans-serif';
+  ctx.font = '500 20px -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
   ctx.fillText(durationStr, 285, 878);
   ctx.restore();
 
@@ -349,19 +311,9 @@ async function renderTicketCanvas(template, rawData) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#1f2937';
-  ctx.font = '700 17px Inter, monospace';
+  ctx.font = '700 17px ui-monospace, Menlo, Consolas, monospace';
   ctx.letterSpacing = '2px';
   ctx.fillText(barcodeCode, canvas.width / 2, cardY + 118);
-  ctx.restore();
-
-  // 5F. Check-in notice
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#556980';
-  ctx.font = '600 14px Inter, sans-serif';
-  ctx.letterSpacing = '2.5px';
-  // ctx.fillText('SHOW THIS TICKET AT CHECK-IN', canvas.width / 2, 1245);
   ctx.restore();
 
   // Export to Blob and DataURL
@@ -371,13 +323,16 @@ async function renderTicketCanvas(template, rawData) {
   return { canvas, blob, dataUrl, normalizedData: data };
 }
 
-// 6. Display Ticket on Screen
+// ============================================================================
+// 6. Display Ticket on Screen & Populate Pass Details
+// ============================================================================
 
 async function displayTicket(rawData) {
   const skeleton = document.getElementById('ticketSkeleton');
   const cardWrapper = document.getElementById('ticketCardWrapper');
   const displayImage = document.getElementById('ticketDisplayImage');
   const actionsPanel = document.getElementById('actionsPanel');
+  const passDetailsCard = document.getElementById('passDetailsCard');
 
   try {
     const template = await loadTemplateImage(TICKET_TEMPLATE);
@@ -394,10 +349,27 @@ async function displayTicket(rawData) {
       displayImage.src = dataUrl;
     }
 
+    // Populate Apple Inset Grouped Pass Details
+    const passDetailTraveler = document.getElementById('passDetailTraveler');
+    const passDetailTrip = document.getElementById('passDetailTrip');
+    const passDetailDate = document.getElementById('passDetailDate');
+    const passDetailDuration = document.getElementById('passDetailDuration');
+    const passDetailId = document.getElementById('passDetailId');
+
+    if (passDetailTraveler) passDetailTraveler.textContent = normalizedData.name;
+    if (passDetailTrip) {
+      const tagText = normalizedData.tag ? ` • ${normalizedData.tag}` : '';
+      passDetailTrip.textContent = normalizedData.trip + tagText;
+    }
+    if (passDetailDate) passDetailDate.textContent = normalizedData.date;
+    if (passDetailDuration) passDetailDuration.textContent = normalizedData.duration ? `(${normalizedData.duration})` : '';
+    if (passDetailId) passDetailId.textContent = normalizedData.ticketId;
+
     // Reveal UI
     if (skeleton) skeleton.style.display = 'none';
-    if (cardWrapper) cardWrapper.style.display = 'block';
+    if (cardWrapper) cardWrapper.style.display = 'flex';
     if (actionsPanel) actionsPanel.style.display = 'flex';
+    if (passDetailsCard) passDetailsCard.style.display = 'flex';
 
     const caption = document.getElementById('ticketCaption');
     const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
@@ -411,7 +383,9 @@ async function displayTicket(rawData) {
   }
 }
 
-// 7. Error & Banner Display Handlers
+// ============================================================================
+// 7. Error Screen Handlers
+// ============================================================================
 
 function showErrorScreen(message) {
   const portalCard = document.getElementById('portalLandingCard');
@@ -437,7 +411,9 @@ function hideErrorScreen() {
   if (errorContainer) errorContainer.style.display = 'none';
 }
 
+// ============================================================================
 // 8. Download Handler
+// ============================================================================
 
 async function handleDownload() {
   if (isExporting || !currentTicketBlob) return;
@@ -450,7 +426,7 @@ async function handleDownload() {
     if (downloadBtn) {
       downloadBtn.classList.add('is-loading');
       downloadBtn.disabled = true;
-      if (btnText) btnText.textContent = 'Preparing PNG...';
+      if (btnText) btnText.textContent = 'Saving PNG...';
     }
 
     await new Promise(r => setTimeout(r, 60));
@@ -470,14 +446,16 @@ async function handleDownload() {
 
     setTimeout(() => URL.revokeObjectURL(ticketUrl), 30000);
 
-    if (btnText) btnText.textContent = 'Downloaded!';
+    showToast('Ticket PNG saved to device!', 'fa-solid fa-circle-check');
+
+    if (btnText) btnText.textContent = 'Saved!';
     setTimeout(() => {
       if (btnText) btnText.textContent = 'Download Ticket (PNG)';
     }, 2000);
 
   } catch (error) {
     console.error('Download failed:', error);
-    alert('Could not download your ticket. Please try again.');
+    showToast('Could not download your ticket. Please try again.', 'fa-solid fa-circle-exclamation');
   } finally {
     isExporting = false;
     if (downloadBtn) {
@@ -487,31 +465,61 @@ async function handleDownload() {
   }
 }
 
-// 9. Clipboard and Toast Helpers
+// ============================================================================
+// 9. Clipboard & Dynamic Island Toast Helpers
+// ============================================================================
 
 let toastTimeout = null;
-function showToast(message, icon = 'fa-circle-check') {
+function showToast(message, icon = 'fa-solid fa-circle-check') {
   let toast = document.getElementById('appToast');
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'appToast';
-    toast.className = 'toast-container';
-    toast.innerHTML = `<i class="fa-solid ${icon} toast-icon"></i><span class="toast-message"></span>`;
+    toast.className = 'dynamic-toast-capsule';
+    toast.innerHTML = `<div class="dynamic-toast-content"><i class="${icon} toast-icon"></i><span class="toast-message"></span></div>`;
     document.body.appendChild(toast);
   }
 
   const msgSpan = toast.querySelector('.toast-message');
   const iconEl = toast.querySelector('.toast-icon');
   if (msgSpan) msgSpan.textContent = message;
-  if (iconEl) iconEl.className = `fa-solid ${icon} toast-icon`;
+  if (iconEl) iconEl.className = `${icon} toast-icon`;
 
   toast.classList.add('show');
 
   if (toastTimeout) clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => {
     toast.classList.remove('show');
-  }, 3200);
+  }, 3000);
 }
+
+async function copyTextToClipboard(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (err) {
+    console.warn('Clipboard writeText failed:', err);
+  }
+
+  try {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    const success = document.execCommand('copy');
+    textarea.remove();
+    return success;
+  } catch {
+    return false;
+  }
+}
+
+const copyToClipboard = copyTextToClipboard;
 
 async function copyImageToClipboard(blob) {
   if (!blob) return false;
@@ -527,7 +535,9 @@ async function copyImageToClipboard(blob) {
   return false;
 }
 
-// 10. Dedicated Multi-View WhatsApp & Instagram Share Logic
+// ============================================================================
+// 10. Multi-View WhatsApp & Instagram Share Logic
+// ============================================================================
 
 function switchShareView(viewName) {
   const mainView = document.getElementById('shareMainView');
@@ -598,14 +608,14 @@ async function shareToWhatsApp() {
   if (imgCopied) {
     showToast('Ticket image copied to clipboard! Paste (Ctrl+V) in WhatsApp chat.', 'fa-brands fa-whatsapp');
   } else {
-    showToast('Click Open WhatsApp Web below to start your chat.', 'fa-brands fa-whatsapp');
+    showToast('Click Open WhatsApp below to start your chat.', 'fa-brands fa-whatsapp');
   }
 }
 
 async function shareToInstagram() {
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  // If mobile with file sharing support, Instagram Stories accepts pure image share!
+  // If mobile with file sharing support, native share accepts pure image share
   if (isMobile && currentTicketBlob && navigator.share && typeof navigator.canShare === 'function') {
     const file = new File([currentTicketBlob], `TripInn-Ticket.png`, { type: 'image/png' });
     if (navigator.canShare({ files: [file] })) {
@@ -619,13 +629,15 @@ async function shareToInstagram() {
     }
   }
 
-  // Desktop fallback: DO NOT auto-download! Copy image to clipboard and show Instagram guide with mobile QR code
+  // Desktop fallback: copy image and show Instagram guide with mobile QR code
   await copyImageToClipboard(currentTicketBlob);
   switchShareView('instagram');
   showToast('Scan QR code with your phone camera to share on Instagram Stories!', 'fa-brands fa-instagram');
 }
 
+// ============================================================================
 // 11. Primary Share Button Handler (Mobile Native -> Modal Fallback)
+// ============================================================================
 
 async function handleShare() {
   try {
@@ -640,8 +652,6 @@ async function handleShare() {
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     // If mobile with file sharing support:
-    // IMPORTANT: Only pass { files: [file] } without text/title so iOS & Android
-    // display both WhatsApp and Instagram in the native share sheet!
     if (isMobile && navigator.share && typeof navigator.canShare === 'function') {
       const customerName = currentTicketData?.name || 'Traveler';
       const safeName = String(customerName)
@@ -669,12 +679,12 @@ async function handleShare() {
           return;
         } catch (err) {
           if (err.name === 'AbortError') return; // User closed sheet
-          console.warn('Native file share cancelled or failed, opening options:', err);
+          console.warn('Native file share cancelled or failed, opening sheet:', err);
         }
       }
     }
 
-    // On desktop or when native file share is unavailable: open the Share Options Modal!
+    // On desktop or when native file share is unavailable: open the Apple Bottom Sheet Modal!
     openShareModal();
 
   } catch (error) {
@@ -683,26 +693,50 @@ async function handleShare() {
   }
 }
 
-// 12. Application Initialization
+// ============================================================================
+// 12. Application Initialization & Event Wiring
+// ============================================================================
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   const downloadBtn = document.getElementById('downloadTrigger');
   const shareBtn = document.getElementById('shareTrigger');
-  const loadSampleBtn = document.getElementById('loadSampleBtn');
-  const previewNotice = document.getElementById('previewNotice');
-  const sampleSelect = document.getElementById('sampleTravelerSelect');
   const headerStatusPill = document.getElementById('headerStatusPill');
   const headerStatusText = document.getElementById('headerStatusText');
+  const headerBrandHome = document.getElementById('headerBrandHome');
 
-  // Wire buttons
+  // Primary action buttons
   if (downloadBtn) downloadBtn.addEventListener('click', handleDownload);
   if (shareBtn) shareBtn.addEventListener('click', handleShare);
 
+  // Brand logo in header returns to portal
+  if (headerBrandHome) {
+    headerBrandHome.style.cursor = 'pointer';
+    headerBrandHome.addEventListener('click', () => {
+      history.pushState('', document.title, window.location.pathname + window.location.search);
+      showPortalView();
+    });
+  }
+
+  // Copy Ticket ID in Pass Details Card
+  const copyTicketIdBtn = document.getElementById('copyTicketIdBtn');
+  if (copyTicketIdBtn) {
+    copyTicketIdBtn.addEventListener('click', async () => {
+      if (currentTicketData?.ticketId) {
+        const ok = await copyTextToClipboard(currentTicketData.ticketId);
+        if (ok) {
+          showToast(`Copied Ticket ID: ${currentTicketData.ticketId}`, 'fa-regular fa-copy');
+        }
+      }
+    });
+  }
+
   // Wire Share Modal Options
   const closeShareModalBtn = document.getElementById('closeShareModal');
+  const cancelShareSheetBtn = document.getElementById('cancelShareSheetBtn');
   const shareModal = document.getElementById('shareModal');
   const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
   const shareInstagramBtn = document.getElementById('shareInstagramBtn');
+  const savePhotosBtn = document.getElementById('savePhotosBtn');
   const copyImageBtn = document.getElementById('copyImageBtn');
   const copyLinkBtn = document.getElementById('copyLinkBtn');
 
@@ -714,6 +748,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const copyForInstaBtn = document.getElementById('copyForInstaBtn');
 
   if (closeShareModalBtn) closeShareModalBtn.addEventListener('click', closeShareModal);
+  if (cancelShareSheetBtn) cancelShareSheetBtn.addEventListener('click', closeShareModal);
+
   if (shareModal) {
     shareModal.addEventListener('click', e => {
       if (e.target === shareModal) closeShareModal();
@@ -727,12 +763,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (shareWhatsAppBtn) shareWhatsAppBtn.addEventListener('click', shareToWhatsApp);
   if (shareInstagramBtn) shareInstagramBtn.addEventListener('click', shareToInstagram);
 
+  if (savePhotosBtn) {
+    savePhotosBtn.addEventListener('click', () => {
+      closeShareModal();
+      handleDownload();
+    });
+  }
+
   if (copyImageBtn) {
     copyImageBtn.addEventListener('click', async () => {
       closeShareModal();
       const success = await copyImageToClipboard(currentTicketBlob);
       if (success) {
-        showToast('Ticket image copied to clipboard! Paste directly in WhatsApp or Instagram.', 'fa-solid fa-copy');
+        showToast('Ticket image copied to clipboard! Paste directly into chat.', 'fa-regular fa-copy');
       } else {
         handleDownload();
       }
@@ -742,7 +785,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (copyLinkBtn) {
     copyLinkBtn.addEventListener('click', async () => {
       closeShareModal();
-      await copyToClipboard(window.location.href);
+      await copyTextToClipboard(window.location.href);
       showToast('Pass link copied to clipboard!', 'fa-solid fa-link');
     });
   }
@@ -755,7 +798,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     recopyWaBtn.addEventListener('click', async () => {
       const success = await copyImageToClipboard(currentTicketBlob);
       if (success) {
-        showToast('Ticket image copied to clipboard! Press Ctrl+V in WhatsApp.', 'fa-solid fa-copy');
+        showToast('Ticket image copied to clipboard! Press Ctrl+V in WhatsApp.', 'fa-regular fa-copy');
       } else {
         showToast('Image clipboard access not available.', 'fa-solid fa-circle-exclamation');
       }
@@ -775,7 +818,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     copyForInstaBtn.addEventListener('click', async () => {
       const success = await copyImageToClipboard(currentTicketBlob);
       if (success) {
-        showToast('Ticket image copied! Paste directly in Instagram Web DMs.', 'fa-solid fa-copy');
+        showToast('Ticket image copied! Paste directly in Instagram Web DMs.', 'fa-regular fa-copy');
       } else {
         showToast('Image clipboard access not available.', 'fa-solid fa-circle-exclamation');
       }
@@ -787,18 +830,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const portalCard = document.getElementById('portalLandingCard');
     const ticketStage = document.getElementById('ticketStage');
     const errorContainer = document.getElementById('errorContainer');
-    const headerStatusPill = document.getElementById('headerStatusPill');
-    const headerStatusText = document.getElementById('headerStatusText');
+    const passDetailsCard = document.getElementById('passDetailsCard');
 
     if (errorContainer) errorContainer.style.display = 'none';
     if (ticketStage) ticketStage.style.display = 'none';
+    if (passDetailsCard) passDetailsCard.style.display = 'none';
     if (portalCard) portalCard.style.display = 'flex';
 
     if (headerStatusPill) {
-      headerStatusPill.style.display = 'inline-flex';
       headerStatusPill.className = 'status-pill portal';
-      const icon = headerStatusPill.querySelector('i');
-      if (icon) icon.className = 'fa-solid fa-shield-halved';
     }
     if (headerStatusText) {
       headerStatusText.textContent = 'Official Portal';
@@ -809,18 +849,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const portalCard = document.getElementById('portalLandingCard');
     const ticketStage = document.getElementById('ticketStage');
     const errorContainer = document.getElementById('errorContainer');
-    const headerStatusPill = document.getElementById('headerStatusPill');
-    const headerStatusText = document.getElementById('headerStatusText');
 
     if (portalCard) portalCard.style.display = 'none';
     if (errorContainer) errorContainer.style.display = 'none';
     if (ticketStage) ticketStage.style.display = 'flex';
 
     if (headerStatusPill) {
-      headerStatusPill.style.display = 'inline-flex';
       headerStatusPill.className = 'status-pill verified';
-      const icon = headerStatusPill.querySelector('i');
-      if (icon) icon.className = 'fa-solid fa-circle-check';
     }
     if (headerStatusText) {
       headerStatusText.textContent = 'Verified Boarding Pass';
@@ -841,7 +876,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         showTicketView();
         displayTicket(decrypted);
       } else {
-        if (headerStatusPill) headerStatusPill.style.display = 'none';
         showErrorScreen('The ticket link provided could not be decrypted or has expired. Please check your link.');
       }
     } else {
@@ -852,6 +886,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Portal Lookup Controls
   const lookupPassBtn = document.getElementById('lookupPassBtn');
   const passLinkInput = document.getElementById('passLinkInput');
+  const clearPassBtn = document.getElementById('clearPassBtn');
+  const pastePassBtn = document.getElementById('pastePassBtn');
   const lookupError = document.getElementById('lookupError');
   const backToPortalBtn = document.getElementById('backToPortalBtn');
   const returnToPortalBtn = document.getElementById('returnToPortalBtn');
@@ -872,7 +908,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (typeof CryptoJS === 'undefined') {
       if (lookupError) {
-        lookupError.textContent = 'Decryption library is loading, please try again in a second.';
+        lookupError.textContent = 'Decryption library is loading, please try again in a moment.';
         lookupError.style.display = 'block';
       }
       return;
@@ -882,8 +918,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (decrypted) {
       if (lookupError) lookupError.style.display = 'none';
       window.location.hash = '#pass=' + token;
-      showTicketView();
-      displayTicket(decrypted);
     } else {
       if (lookupError) {
         lookupError.textContent = 'Invalid ticket token. Please paste the full link sent by TripInn Holidays.';
@@ -893,6 +927,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (lookupPassBtn) lookupPassBtn.addEventListener('click', handlePassLookup);
+
   if (passLinkInput) {
     passLinkInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
@@ -900,10 +935,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         handlePassLookup();
       }
     });
+
     passLinkInput.addEventListener('input', () => {
+      if (lookupError) lookupError.style.display = 'none';
+      if (clearPassBtn) {
+        clearPassBtn.style.display = passLinkInput.value ? 'flex' : 'none';
+      }
+    });
+  }
+
+  if (clearPassBtn) {
+    clearPassBtn.addEventListener('click', () => {
+      if (passLinkInput) {
+        passLinkInput.value = '';
+        passLinkInput.focus();
+      }
+      clearPassBtn.style.display = 'none';
       if (lookupError) lookupError.style.display = 'none';
     });
   }
+
+  if (pastePassBtn && passLinkInput) {
+    pastePassBtn.addEventListener('click', async () => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            passLinkInput.value = text.trim();
+            if (clearPassBtn) clearPassBtn.style.display = 'flex';
+            handlePassLookup();
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Clipboard readText failed or was denied:', err);
+      }
+      passLinkInput.focus();
+      showToast('Please paste your link into the field.', 'fa-solid fa-paste');
+    });
+  }
+
+  // Wire Sample Traveler Chips
+  document.querySelectorAll('.sample-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const token = chip.getAttribute('data-token');
+      if (token) {
+        window.location.hash = '#pass=' + token;
+      }
+    });
+  });
 
   if (backToPortalBtn) {
     backToPortalBtn.addEventListener('click', () => {

@@ -1,141 +1,697 @@
 /* ==========================================================================
-   TripInn Holidays — Digital Travel Pass Stylesheet
-   Modern, responsive, high-fidelity ticket display and download interface
+   TripInn Holidays — Digital Travel Pass
+   Apple Design System & Mobile-First High-Fidelity Stylesheet
+   Follows Apple Human Interface Guidelines (Clarity, Deference, Depth)
    ========================================================================== */
 
 :root {
-  --primary-navy: #0b1329;
-  --secondary-navy: #152238;
-  --accent-cyan: #06b6d4;
-  --accent-emerald: #10b981;
-  --accent-emerald-dark: #047857;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --card-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --ticket-max-width: 440px;
-  --shadow-elevation: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 35px rgba(6, 182, 212, 0.12);
+  /* Apple iOS Dark Palette */
+  --apple-bg: #060911;
+  --apple-bg-subtle: #0c1220;
+  --apple-surface: rgba(255, 255, 255, 0.045);
+  --apple-surface-hover: rgba(255, 255, 255, 0.08);
+  --apple-surface-active: rgba(255, 255, 255, 0.12);
+  --apple-border: rgba(255, 255, 255, 0.12);
+  --apple-border-light: rgba(255, 255, 255, 0.18);
+  --apple-divider: rgba(255, 255, 255, 0.065);
+
+  /* Apple System Colors */
+  --apple-green: #30d158;
+  --apple-green-deep: #248a3d;
+  --apple-cyan: #64d2ff;
+  --apple-blue: #0a84ff;
+  --apple-teal: #06b6d4;
+  --apple-emerald: #10b981;
+  --apple-red: #ff453a;
+  --apple-orange: #ff9f0a;
+  --apple-indigo: #5e5ce6;
+
+  /* Typographic Labels */
+  --apple-text-primary: #ffffff;
+  --apple-text-secondary: rgba(235, 235, 245, 0.68);
+  --apple-text-tertiary: rgba(235, 235, 245, 0.42);
+  --apple-text-quaternary: rgba(235, 235, 245, 0.2);
+
+  /* Layout Constants */
+  --ticket-max-width: 430px;
+  --content-max-width: 580px;
+
+  /* Apple Radii (Continuous Squircles) */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* Shadows & Depth */
+  --apple-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --apple-shadow-md: 0 12px 30px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --apple-shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(6, 182, 212, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --apple-sheet-shadow: 0 -15px 40px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+  /* Spring Transitions */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-* {
+/* Base Reset & Mobile Viewport Handling */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  font-size: 16px;
+  background-color: var(--apple-bg);
+  color-scheme: dark;
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--primary-navy);
-  background-image: 
-    radial-gradient(at 15% 15%, rgba(6, 182, 212, 0.15) 0px, transparent 55%),
-    radial-gradient(at 85% 85%, rgba(16, 185, 129, 0.12) 0px, transparent 55%),
-    radial-gradient(at 50% 50%, rgba(30, 41, 59, 0.7) 0px, transparent 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Inter", system-ui, sans-serif;
+  background-color: var(--apple-bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(10, 132, 255, 0.18) 0%, transparent 70%),
+    radial-gradient(circle 380px at 85% 30%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+    radial-gradient(circle 420px at 15% 75%, rgba(6, 182, 212, 0.10) 0%, transparent 60%);
   background-attachment: fixed;
-  color: var(--text-main);
+  color: var(--apple-text-primary);
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 24px 16px 48px;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 /* App Container */
 .app-layout {
   width: 100%;
-  max-width: 620px;
+  max-width: var(--content-max-width);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
 }
 
-/* Header */
+/* ==========================================================================
+   Apple Frosted Glass Navigation Bar (Capsule Header)
+   ========================================================================== */
 .app-header {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 18px;
-  background: rgba(21, 34, 56, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 9999px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  padding: 8px 14px;
+  background: rgba(18, 25, 40, 0.72);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--apple-shadow-md);
+  position: sticky;
+  top: max(12px, env(safe-area-inset-top));
+  z-index: 100;
+  transition: transform 0.25s var(--ease-spring), background 0.25s ease;
 }
 
 .brand-pill {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #ffffff;
+  gap: 9px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--apple-text-primary);
+  user-select: none;
 }
 
 .brand-logo-img {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 5px rgba(6, 182, 212, 0.45));
+  filter: drop-shadow(0 2px 6px rgba(6, 182, 212, 0.4));
 }
 
-.brand-icon {
-  color: var(--accent-cyan);
-  font-size: 1.1rem;
+.brand-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(16, 185, 129, 0.14);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  white-space: nowrap;
+}
+
+.status-pill.portal {
+  background: rgba(6, 182, 212, 0.12);
+  color: #38bdf8;
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.status-pill.verified {
+  background: rgba(16, 185, 129, 0.16);
+  color: #4ade80;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.status-indicator-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  animation: pulseDot 2.2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.85); }
+}
+
+/* ==========================================================================
+   Apple Dynamic Island Toast Capsule
+   ========================================================================== */
+.dynamic-toast-capsule {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px) scale(0.9);
+  background: rgba(14, 20, 32, 0.94);
+  backdrop-filter: blur(30px) saturate(220%);
+  -webkit-backdrop-filter: blur(30px) saturate(220%);
+  border: 1px solid var(--apple-border-light);
+  border-radius: var(--radius-full);
+  padding: 9px 18px;
+  box-shadow: 0 12px 35px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(16, 185, 129, 0.25);
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.38s var(--ease-spring), opacity 0.25s ease;
+}
+
+.dynamic-toast-capsule.show {
+  transform: translateX(-50%) translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dynamic-toast-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.toast-icon {
+  color: var(--apple-green);
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Portal Landing Card View
+   ========================================================================== */
+.portal-landing-card {
+  width: 100%;
+  background: rgba(18, 25, 42, 0.75);
+  backdrop-filter: blur(30px) saturate(190%);
+  -webkit-backdrop-filter: blur(30px) saturate(190%);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-xl);
+  padding: 26px 20px;
+  box-shadow: var(--apple-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  animation: appleFadeIn 0.4s var(--ease-spring);
+}
+
+@keyframes appleFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Hero Header */
+.portal-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.portal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px;
+  border-radius: var(--radius-full);
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.28);
+  color: var(--apple-cyan);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.portal-title {
+  font-size: 1.95rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ffffff 40%, #7dd3fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.portal-tagline {
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: var(--apple-text-secondary);
+  line-height: 1.45;
+  max-width: 420px;
+}
+
+/* Portal Lookup Section */
+.portal-lookup-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lookup-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--apple-text-tertiary);
+  padding-left: 2px;
+}
+
+.pass-lookup-box {
   display: flex;
   align-items: center;
   gap: 6px;
+  background: rgba(10, 15, 26, 0.88);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-lg);
+  padding: 6px 8px 6px 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pass-lookup-box:focus-within {
+  border-color: var(--apple-cyan);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.22);
+}
+
+.lookup-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lookup-icon {
+  color: var(--apple-cyan);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+/* Crucial: 16px font-size to prevent iOS Safari auto-zoom glitch */
+.pass-lookup-box input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.pass-lookup-box input::placeholder {
+  color: var(--apple-text-tertiary);
+  font-size: 0.88rem;
+}
+
+.btn-input-clear {
+  background: none;
+  border: none;
+  color: var(--apple-text-tertiary);
+  font-size: 1rem;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.btn-input-clear:hover {
+  color: #ffffff;
+}
+
+.btn-paste {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  color: var(--apple-text-secondary);
+  font-family: inherit;
   font-size: 0.78rem;
   font-weight: 600;
-  padding: 5px 12px;
-  border-radius: 9999px;
-  background: rgba(16, 185, 129, 0.15);
+  padding: 7px 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.btn-paste:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.btn-paste:active {
+  transform: scale(0.96);
+}
+
+.btn-lookup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 15px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35);
+  transition: all 0.2s var(--ease-spring);
+}
+
+.btn-lookup:hover {
+  background: linear-gradient(135deg, #22d3ee 0%, #0369a1 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(6, 182, 212, 0.45);
+}
+
+.btn-lookup:active {
+  transform: scale(0.96);
+}
+
+.lookup-error {
+  font-size: 0.8rem;
+  color: var(--apple-red);
+  padding-left: 4px;
+}
+
+/* ==========================================================================
+   Quick Sample Passes (Apple Inset Chips)
+   ========================================================================== */
+.sample-passes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.sample-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.sample-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--apple-text-tertiary);
+}
+
+.sample-chips-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sample-chips-row::-webkit-scrollbar {
+  display: none;
+}
+
+.sample-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  cursor: pointer;
+  color: var(--apple-text-primary);
+  font-family: inherit;
+  text-align: left;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s var(--ease-spring);
+}
+
+.sample-chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(6, 182, 212, 0.4);
+  transform: translateY(-1px);
+}
+
+.sample-chip:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.chip-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+.chip-avatar.munnar {
+  background: rgba(16, 185, 129, 0.18);
   color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.status-pill.preview {
-  background: rgba(168, 85, 247, 0.15);
-  color: #c084fc;
-  border-color: rgba(168, 85, 247, 0.3);
+.chip-avatar.kodai {
+  background: rgba(6, 182, 212, 0.18);
+  color: #38bdf8;
 }
 
-/* Error Alert */
+.chip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.chip-info strong {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.chip-info span {
+  font-size: 0.72rem;
+  color: var(--apple-text-secondary);
+}
+
+/* ==========================================================================
+   Apple Inset Grouped Table Cards (Settings & Wallet Style)
+   ========================================================================== */
+.apple-grouped-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grouped-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--apple-text-tertiary);
+  padding: 0 4px;
+}
+
+.grouped-list {
+  background: rgba(10, 15, 26, 0.75);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.grouped-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 15px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease;
+  position: relative;
+}
+
+.grouped-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 56px;
+  right: 0;
+  height: 1px;
+  background: var(--apple-divider);
+}
+
+.grouped-item:hover {
+  background: var(--apple-surface-hover);
+}
+
+.grouped-item:active {
+  background: var(--apple-surface-active);
+}
+
+.grouped-item.static:hover {
+  background: transparent;
+}
+
+.grouped-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.grouped-item-icon.website {
+  background: rgba(6, 182, 212, 0.16);
+  color: var(--apple-cyan);
+}
+
+.grouped-item-icon.whatsapp {
+  background: rgba(37, 211, 102, 0.16);
+  color: #25d366;
+}
+
+.grouped-item-icon.shield {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+}
+
+.grouped-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.grouped-item-content strong {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.grouped-item-content span {
+  font-size: 0.76rem;
+  color: var(--apple-text-secondary);
+  line-height: 1.35;
+}
+
+.grouped-chevron {
+  color: var(--apple-text-quaternary);
+  font-size: 0.8rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.grouped-item:hover .grouped-chevron {
+  color: var(--apple-text-secondary);
+  transform: translateX(2px);
+}
+
+/* ==========================================================================
+   Error Alert State
+   ========================================================================== */
 .error-container {
   width: 100%;
-  animation: fadeIn 0.3s ease;
+  animation: appleFadeIn 0.3s ease;
 }
 
 .error-card {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 15px;
   background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 16px;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  border-radius: var(--radius-lg);
   padding: 18px;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
 }
 
 .error-icon-box {
   background: rgba(239, 68, 68, 0.2);
   color: #f87171;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   flex-shrink: 0;
 }
 
@@ -144,82 +700,29 @@ body {
 }
 
 .error-title {
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: #fecaca;
   margin-bottom: 4px;
 }
 
 .error-desc {
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   color: #fca5a5;
   line-height: 1.45;
   margin-bottom: 12px;
 }
 
-/* Preview Banner */
-.preview-banner {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(129, 140, 248, 0.25);
-  border-radius: 14px;
-  padding: 12px 16px;
-  backdrop-filter: blur(8px);
-}
-
-.preview-banner-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.84rem;
-  color: #e0e7ff;
-}
-
-.preview-banner-content i {
-  color: #818cf8;
-}
-
-.preview-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.82rem;
-  color: #c7d2fe;
-}
-
-.preview-controls label {
-  white-space: nowrap;
-  font-weight: 500;
-}
-
-.sample-select {
-  flex: 1;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(129, 140, 248, 0.35);
-  color: #ffffff;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-family: inherit;
-  outline: none;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-}
-
-.sample-select:focus {
-  border-color: var(--accent-cyan);
-}
-
-/* Ticket Display Stage */
+/* ==========================================================================
+   Main Ticket Stage (Apple Wallet Style Pass View)
+   ========================================================================== */
 .ticket-stage {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
+  animation: appleFadeIn 0.4s var(--ease-spring);
 }
 
 /* Skeleton Loading State */
@@ -227,15 +730,15 @@ body {
   width: 100%;
   max-width: var(--ticket-max-width);
   aspect-ratio: 1024 / 1536;
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  background: rgba(20, 28, 46, 0.65);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-elevation);
+  box-shadow: var(--apple-shadow-lg);
 }
 
 .skeleton-shimmer {
@@ -244,13 +747,13 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.08) 50%,
     transparent 100%
   );
-  animation: shimmer 1.8s infinite;
+  animation: appleShimmer 1.8s infinite;
 }
 
-@keyframes shimmer {
+@keyframes appleShimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
@@ -260,29 +763,32 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  color: var(--text-muted);
-  font-size: 0.88rem;
+  color: var(--apple-text-secondary);
+  font-size: 0.86rem;
   font-weight: 500;
   z-index: 1;
 }
 
 .skeleton-spinner i {
-  font-size: 2rem;
-  color: var(--accent-cyan);
+  font-size: 1.9rem;
+  color: var(--apple-cyan);
 }
 
-/* Ticket Card Presentation */
+/* Apple Wallet Pass Presentation Card */
 .ticket-card-wrapper {
   width: 100%;
   max-width: var(--ticket-max-width);
-  position: relative;
-  animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: passPopIn 0.5s var(--ease-spring);
 }
 
-@keyframes popIn {
+@keyframes passPopIn {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.97);
+    transform: translateY(24px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -290,21 +796,44 @@ body {
   }
 }
 
+.pass-verified-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  border-radius: var(--radius-full);
+  padding: 5px 14px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #34d399;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.verified-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--apple-green);
+  box-shadow: 0 0 8px var(--apple-green);
+}
+
 .ticket-frame {
   position: relative;
   width: 100%;
   display: flex;
   justify-content: center;
-  filter: drop-shadow(0 20px 35px rgba(0, 0, 0, 0.65))
-          drop-shadow(0 4px 12px rgba(6, 182, 212, 0.15));
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-              filter 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(6, 182, 212, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: transform 0.35s var(--ease-spring), box-shadow 0.35s var(--ease-spring);
 }
 
 .ticket-frame:hover {
-  transform: translateY(-5px);
-  filter: drop-shadow(0 28px 45px rgba(0, 0, 0, 0.75))
-          drop-shadow(0 8px 24px rgba(6, 182, 212, 0.25));
+  transform: translateY(-4px) scale(1.008);
+  box-shadow: 0 32px 70px -12px rgba(0, 0, 0, 0.9), 0 0 45px rgba(6, 182, 212, 0.28);
 }
 
 .ticket-render-image {
@@ -317,47 +846,199 @@ body {
   -webkit-user-drag: none;
 }
 
-/* Action Panel */
+/* Touch Guidance Tip */
+.ticket-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: var(--apple-text-tertiary);
+  text-align: center;
+  max-width: var(--ticket-max-width);
+  line-height: 1.4;
+  padding: 0 8px;
+}
+
+.ticket-caption i {
+  color: var(--apple-cyan);
+}
+
+/* ==========================================================================
+   Apple Inset Grouped Pass Details Card
+   ========================================================================== */
+.pass-details-card {
+  width: 100%;
+  max-width: var(--ticket-max-width);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: appleFadeIn 0.4s var(--ease-spring) 0.1s both;
+}
+
+.pass-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  position: relative;
+}
+
+.pass-info-row:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  background: var(--apple-divider);
+}
+
+.pass-info-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.82rem;
+  color: var(--apple-text-secondary);
+}
+
+.pass-info-label i {
+  color: var(--apple-cyan);
+  font-size: 0.86rem;
+  width: 16px;
+  text-align: center;
+}
+
+.pass-info-value {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: right;
+}
+
+.pass-info-value-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.pass-info-value-block strong {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pass-info-sub {
+  font-size: 0.74rem;
+  color: var(--apple-text-tertiary);
+}
+
+.pass-info-action-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ticket-id-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #ffffff;
+}
+
+.btn-mini-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  color: var(--apple-cyan);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-mini-copy:hover {
+  background: rgba(6, 182, 212, 0.25);
+  color: #ffffff;
+}
+
+.btn-mini-copy:active {
+  transform: scale(0.94);
+}
+
+.pass-status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #34d399;
+}
+
+.pass-status-tag i {
+  font-size: 0.82rem;
+}
+
+/* ==========================================================================
+   Action Panel & Mobile Thumb Dock
+   ========================================================================== */
 .actions-panel {
   width: 100%;
   max-width: var(--ticket-max-width);
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  animation: fadeIn 0.4s ease 0.2s both;
+  animation: appleFadeIn 0.4s var(--ease-spring) 0.15s both;
 }
 
-/* Primary Download Button */
+.actions-buttons-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Apple Primary Button (Download) */
 .btn-primary {
   flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 9px;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #ffffff;
   border: none;
-  padding: 14px 22px;
-  border-radius: 14px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: var(--radius-lg);
   font-family: inherit;
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4),
-              0 0 0 1px rgba(255, 255, 255, 0.15) inset;
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s var(--ease-spring), box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .btn-primary:hover {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px -4px rgba(16, 185, 129, 0.5),
-              0 0 0 1px rgba(255, 255, 255, 0.25) inset;
+  box-shadow: 0 12px 28px -4px rgba(16, 185, 129, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .btn-primary:active {
-  transform: translateY(1px);
-  box-shadow: 0 6px 16px -3px rgba(16, 185, 129, 0.4);
+  transform: scale(0.97);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 .btn-icon-wrapper {
@@ -381,168 +1062,159 @@ body {
 .btn-primary:disabled {
   opacity: 0.75;
   cursor: wait;
-  transform: none !important;
 }
 
-/* Secondary Button (Share) */
+/* Apple Secondary Button (Share) */
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   background: rgba(255, 255, 255, 0.08);
-  color: var(--text-main);
-  border: 1px solid var(--glass-border);
-  padding: 14px 20px;
-  border-radius: 14px;
+  color: var(--apple-text-primary);
+  border: 1px solid var(--apple-border);
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: var(--radius-lg);
   font-family: inherit;
-  font-size: 0.94rem;
+  font-size: 0.92rem;
   font-weight: 600;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: all 0.25s ease;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: all 0.2s var(--ease-spring);
 }
 
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
 }
 
 .btn-secondary:active {
-  transform: translateY(1px);
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.18);
 }
 
-.btn-secondary.btn-copied {
-  background: rgba(16, 185, 129, 0.2) !important;
-  border-color: rgba(16, 185, 129, 0.5) !important;
-  color: #34d399 !important;
-}
-
-/* Floating Toast Notification */
-.toast-container {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: rgba(15, 23, 42, 0.94);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  color: #ffffff;
-  padding: 12px 22px;
-  border-radius: 9999px;
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.2);
-  display: flex;
+.btn-text-link {
+  background: transparent;
+  border: none;
+  color: var(--apple-text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.88rem;
-  font-weight: 500;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 1000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+  margin: 0 auto;
 }
 
-.toast-container.show {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
+.btn-text-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.toast-icon {
-  color: #34d399;
-  font-size: 1rem;
+.btn-text-link:active {
+  transform: scale(0.97);
 }
 
-/* Social Brand Icons on Share Button */
-.whatsapp-brand-icon {
-  color: #25d366;
-  font-size: 1.15rem;
-}
-
-.instagram-brand-icon {
-  color: #f43f5e;
-  font-size: 1.15rem;
-}
-
-/* Share Modal Dialog */
+/* ==========================================================================
+   Apple iOS Style Bottom Sheet Modal
+   ========================================================================== */
 .share-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(11, 19, 41, 0.78);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 16px;
   z-index: 999;
-  animation: fadeIn 0.25s ease;
+  animation: overlayFadeIn 0.25s ease;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .share-modal-card {
   position: relative;
   width: 100%;
-  max-width: 440px;
-  background: #152238;
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  padding: 24px 20px;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 30px rgba(6, 182, 212, 0.15);
+  max-width: 480px;
+  background: rgba(18, 25, 42, 0.94);
+  backdrop-filter: blur(35px) saturate(220%);
+  -webkit-backdrop-filter: blur(35px) saturate(220%);
+  border: 1px solid var(--apple-border-light);
+  border-top-left-radius: var(--radius-2xl);
+  border-top-right-radius: var(--radius-2xl);
+  border-bottom: none;
+  padding: 12px 18px max(24px, env(safe-area-inset-bottom));
+  box-shadow: var(--apple-sheet-shadow);
   display: flex;
   flex-direction: column;
   gap: 16px;
-  animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: sheetSlideUp 0.34s var(--ease-spring);
 }
 
-@keyframes modalPop {
+@keyframes sheetSlideUp {
   from {
-    opacity: 0;
-    transform: scale(0.93) translateY(12px);
+    transform: translateY(100%);
   }
   to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0);
   }
+}
+
+/* iOS Grabber Pill */
+.sheet-grabber {
+  width: 38px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.28);
+  margin: 0 auto 4px;
 }
 
 .share-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-right: 36px;
 }
 
 .share-modal-title-box {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   color: #ffffff;
   font-size: 1.05rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .share-modal-title-box i {
-  color: var(--accent-cyan);
+  color: var(--apple-cyan);
 }
 
 .btn-close-modal {
-  position: absolute;
-  top: 18px;
-  right: 18px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--glass-border);
-  color: var(--text-muted);
+  border: 1px solid var(--apple-border);
+  color: var(--apple-text-secondary);
   width: 32px;
   height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 5;
+  transition: all 0.15s ease;
 }
 
 .btn-close-modal:hover {
@@ -550,83 +1222,177 @@ body {
   color: #ffffff;
 }
 
-.share-modal-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  line-height: 1.45;
+.btn-close-modal:active {
+  transform: scale(0.92);
 }
 
-/* Share View Switcher */
+/* Share Views */
 .share-view {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
 }
 
-.share-view[style*="display: none"] {
-  display: none !important;
+.share-options-grouped {
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 15, 26, 0.7);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
+.share-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 15px;
+  background: transparent;
+  border: none;
+  color: var(--apple-text-primary);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.share-option-btn:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 60px;
+  right: 0;
+  height: 1px;
+  background: var(--apple-divider);
+}
+
+.share-option-btn:hover {
+  background: var(--apple-surface-hover);
+}
+
+.share-option-btn:active {
+  background: var(--apple-surface-active);
+}
+
+.share-option-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.whatsapp-opt-icon {
+  background: rgba(37, 211, 102, 0.18);
+  color: #25d366;
+}
+
+.instagram-opt-icon {
+  background: linear-gradient(135deg, rgba(240, 148, 51, 0.22), rgba(220, 39, 67, 0.22));
+  color: #f43f5e;
+}
+
+.photos-opt-icon {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+}
+
+.link-opt-icon {
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+}
+
+.copy-opt-icon {
+  background: rgba(6, 182, 212, 0.18);
+  color: var(--apple-cyan);
+}
+
+.share-option-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.share-option-info strong {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.share-option-info span {
+  font-size: 0.74rem;
+  color: var(--apple-text-secondary);
+}
+
+.chevron-icon {
+  color: var(--apple-text-quaternary);
+  font-size: 0.8rem;
+}
+
+/* Guide Subviews */
 .guide-header {
   display: flex;
   align-items: center;
-  padding-right: 36px;
 }
 
 .guide-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 9999px;
-  font-size: 0.88rem;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
   font-weight: 700;
 }
 
 .guide-badge.whatsapp {
-  background: rgba(37, 211, 102, 0.15);
+  background: rgba(37, 211, 102, 0.16);
   color: #25d366;
-  border: 1px solid rgba(37, 211, 102, 0.35);
+  border: 1px solid rgba(37, 211, 102, 0.32);
 }
 
 .guide-badge.instagram {
-  background: linear-gradient(135deg, rgba(240, 148, 51, 0.2), rgba(220, 39, 67, 0.2));
+  background: rgba(244, 63, 94, 0.16);
   color: #f43f5e;
-  border: 1px solid rgba(244, 63, 94, 0.35);
+  border: 1px solid rgba(244, 63, 94, 0.32);
 }
 
 .guide-intro {
-  font-size: 0.86rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-  margin: 0;
+  font-size: 0.82rem;
+  color: var(--apple-text-secondary);
+  line-height: 1.45;
 }
 
 .guide-content-box {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 14px;
-  padding: 16px;
+  background: rgba(10, 15, 26, 0.7);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .guide-step {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 11px;
 }
 
 .step-num {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: var(--accent-cyan);
-  color: #0b1329;
+  background: var(--apple-cyan);
+  color: #060911;
   font-weight: 800;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -637,20 +1403,19 @@ body {
 .step-text {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .step-text strong {
-  color: #ffffff;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   font-weight: 600;
+  color: #ffffff;
 }
 
 .step-text p {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  line-height: 1.45;
-  margin: 0;
+  font-size: 0.78rem;
+  color: var(--apple-text-secondary);
+  line-height: 1.4;
 }
 
 .kbd-key {
@@ -658,18 +1423,17 @@ body {
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 4px;
-  padding: 1px 6px;
-  font-size: 0.76rem;
+  padding: 1px 5px;
+  font-size: 0.72rem;
   font-family: inherit;
   font-weight: 700;
   color: #ffffff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .guide-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
 }
 
 .btn-wa {
@@ -677,43 +1441,31 @@ body {
   color: #ffffff !important;
   text-decoration: none;
   justify-content: center;
-  font-weight: 600;
-  box-shadow: 0 10px 25px -5px rgba(37, 211, 102, 0.4);
-}
-
-.btn-wa:hover {
-  background: linear-gradient(135deg, #28e06c, #149c8c);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px -5px rgba(37, 211, 102, 0.5);
+  font-weight: 700;
+  box-shadow: 0 8px 20px -4px rgba(37, 211, 102, 0.45);
 }
 
 .btn-insta {
   background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
   color: #ffffff;
   justify-content: center;
-  box-shadow: 0 10px 25px -5px rgba(220, 39, 67, 0.4);
-}
-
-.btn-insta:hover {
-  filter: brightness(1.1);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px -5px rgba(220, 39, 67, 0.5);
+  font-weight: 700;
+  box-shadow: 0 8px 20px -4px rgba(220, 39, 67, 0.45);
 }
 
 .btn-back-link {
   background: none;
   border: none;
-  color: var(--text-muted);
-  font-size: 0.84rem;
+  color: var(--apple-text-secondary);
+  font-size: 0.8rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   cursor: pointer;
-  padding: 8px;
-  margin-top: 2px;
-  transition: color 0.2s ease;
+  padding: 6px;
+  transition: color 0.15s ease;
 }
 
 .btn-back-link:hover {
@@ -725,512 +1477,160 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 14px;
   background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-  gap: 8px;
-  margin: 4px auto;
+  border-radius: var(--radius-md);
+  gap: 6px;
+  margin: 0 auto;
   width: fit-content;
 }
 
 .qr-image {
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
   object-fit: contain;
   display: block;
-  border-radius: 6px;
 }
 
 .qr-hint {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: #1e293b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
-.share-options-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.share-option-btn {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  color: var(--text-main);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.share-option-btn:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.18);
-  transform: translateY(-1px);
-}
-
-.share-option-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.45rem;
-  flex-shrink: 0;
-}
-
-.whatsapp-opt-icon {
-  background: rgba(37, 211, 102, 0.15);
-  color: #25d366;
-}
-
-.instagram-opt-icon {
-  background: linear-gradient(135deg, rgba(240, 148, 51, 0.2), rgba(220, 39, 67, 0.2), rgba(188, 24, 136, 0.2));
-  color: #f43f5e;
-}
-
-.copy-opt-icon {
-  background: rgba(6, 182, 212, 0.15);
-  color: var(--accent-cyan);
-}
-
-.link-opt-icon {
-  background: rgba(168, 85, 247, 0.15);
-  color: #c084fc;
-}
-
-.share-option-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.share-option-info strong {
-  font-size: 0.92rem;
-  font-weight: 700;
+/* iOS Sheet Cancel Button */
+.btn-sheet-cancel {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--apple-border);
   color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 13px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
-.share-option-info span {
-  font-size: 0.78rem;
-  color: var(--text-muted);
+.btn-sheet-cancel:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
-.chevron-icon {
-  color: rgba(255, 255, 255, 0.25);
-  font-size: 0.85rem;
+.btn-sheet-cancel:active {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.18);
 }
 
-/* Caption Guidance */
-.ticket-caption {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  text-align: center;
-  max-width: var(--ticket-max-width);
-  line-height: 1.4;
-  padding: 0 10px;
+/* Desktop Bottom Sheet Styling Adaptations */
+@media (min-width: 641px) {
+  .share-modal-overlay {
+    align-items: center;
+    padding: 20px;
+  }
+
+  .share-modal-card {
+    border-radius: var(--radius-xl);
+    border-bottom: 1px solid var(--apple-border-light);
+    animation: appleModalPop 0.3s var(--ease-spring);
+    padding: 22px 24px;
+  }
+
+  .sheet-grabber {
+    display: none;
+  }
+
+  @keyframes appleModalPop {
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
 }
 
-.ticket-caption i {
-  color: var(--accent-cyan);
-  font-size: 0.95rem;
-  flex-shrink: 0;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
+/* ==========================================================================
+   Mobile-First Thumb-Zone Optimizations (< 640px)
+   ========================================================================== */
+@media (max-width: 640px) {
   body {
-    padding: 16px 12px 36px;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-bottom: 96px; /* Room for sticky bottom actions dock */
   }
 
   .app-header {
-    padding: 10px 14px;
+    padding: 7px 12px;
   }
 
   .brand-pill {
     font-size: 0.88rem;
   }
 
-  .status-pill {
-    font-size: 0.72rem;
-    padding: 4px 10px;
+  .portal-landing-card {
+    padding: 22px 16px;
+    border-radius: var(--radius-lg);
   }
 
-  .actions-panel {
-    flex-direction: column;
+  .portal-title {
+    font-size: 1.65rem;
+  }
+
+  .portal-tagline {
+    font-size: 0.84rem;
+  }
+
+  .ticket-card-wrapper {
     gap: 10px;
   }
 
-  .btn-primary, .btn-secondary {
-    width: 100%;
-    padding: 13px 18px;
+  .pass-info-row {
+    padding: 10px 14px;
   }
-}
 
-/* ==========================================================================
-   Portal Landing Card (Direct index.html without pass parameter)
-   ========================================================================== */
-
-.status-pill.portal {
-  background: rgba(6, 182, 212, 0.15);
-  color: #38bdf8;
-  border-color: rgba(6, 182, 212, 0.35);
-}
-
-.portal-landing-card {
-  width: 100%;
-  background: rgba(21, 34, 56, 0.72);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding: 30px 22px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(6, 182, 212, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  animation: fadeIn 0.4s ease;
-}
-
-/* Portal Hero Header */
-.portal-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 10px;
-}
-
-.portal-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 9999px;
-  background: rgba(6, 182, 212, 0.15);
-  border: 1px solid rgba(6, 182, 212, 0.35);
-  color: var(--accent-cyan);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.portal-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 2.1rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #ffffff;
-  background: linear-gradient(135deg, #ffffff 40%, #67e8f9 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  line-height: 1.15;
-}
-
-.portal-tagline {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  max-width: 440px;
-  line-height: 1.5;
-}
-
-/* Notice Card */
-.portal-notice-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  background: rgba(6, 182, 212, 0.06);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  border-radius: 16px;
-  padding: 14px 16px;
-}
-
-.notice-icon-box {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: rgba(6, 182, 212, 0.2);
-  color: var(--accent-cyan);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.15rem;
-  flex-shrink: 0;
-}
-
-.notice-content h3 {
-  font-size: 0.94rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 3px;
-}
-
-.notice-content p {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-/* Pass Lookup Section */
-.portal-lookup-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.lookup-label {
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: #e2e8f0;
-}
-
-.pass-lookup-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 14px;
-  padding: 5px 6px 5px 14px;
-  transition: all 0.25s ease;
-}
-
-.pass-lookup-box:focus-within {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
-}
-
-.lookup-input-wrapper {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.lookup-icon {
-  color: var(--accent-cyan);
-  font-size: 0.92rem;
-}
-
-.pass-lookup-box input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 0.86rem;
-}
-
-.pass-lookup-box input::placeholder {
-  color: #64748b;
-}
-
-.btn-lookup {
-  background: linear-gradient(135deg, #06b6d4, #0284c7);
-  color: #ffffff;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-family: inherit;
-  font-size: 0.84rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.btn-lookup:hover {
-  background: linear-gradient(135deg, #22d3ee, #0369a1);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.4);
-}
-
-.btn-lookup:active {
-  transform: translateY(1px);
-}
-
-.lookup-error {
-  font-size: 0.8rem;
-  color: #f87171;
-  padding-left: 4px;
-}
-
-/* Website Redirection Card */
-.portal-website-card {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 16px;
-  padding: 16px 18px;
-  transition: all 0.25s ease;
-}
-
-.portal-website-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(6, 182, 212, 0.35);
-  transform: translateY(-1px);
-}
-
-.website-card-content {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.website-icon-box {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: rgba(6, 182, 212, 0.16);
-  color: var(--accent-cyan);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-.website-text {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.website-text strong {
-  font-size: 0.9rem;
-  color: #ffffff;
-  font-weight: 700;
-}
-
-.website-text span {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  line-height: 1.45;
-}
-
-.btn-visit-website {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.18), rgba(2, 132, 199, 0.18));
-  border: 1px solid rgba(6, 182, 212, 0.4);
-  color: #38bdf8 !important;
-  text-decoration: none;
-  font-size: 0.88rem;
-  font-weight: 700;
-  padding: 11px 18px;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.btn-visit-website:hover {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(2, 132, 199, 0.3));
-  border-color: var(--accent-cyan);
-  color: #ffffff !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
-}
-
-.btn-visit-website i {
-  font-size: 0.82rem;
-}
-
-/* Support Footer Strip */
-.portal-support-strip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
-  padding: 14px 16px;
-  text-align: center;
-}
-
-@media (min-width: 480px) {
-  .portal-support-strip {
-    flex-direction: row;
-    text-align: left;
+  .pass-info-label {
+    font-size: 0.78rem;
   }
-}
 
-.support-text {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
+  .pass-info-value {
+    font-size: 0.84rem;
+  }
 
-.btn-whatsapp-support {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #25d366, #128c7e);
-  color: #ffffff !important;
-  text-decoration: none;
-  font-size: 0.84rem;
-  font-weight: 700;
-  padding: 9px 16px;
-  border-radius: 9999px;
-  white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
-  transition: all 0.2s ease;
-}
+  /* Fixed Thumb-Friendly Bottom Dock when viewing ticket */
+  .actions-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    background: rgba(14, 20, 32, 0.88);
+    backdrop-filter: blur(30px) saturate(220%);
+    -webkit-backdrop-filter: blur(30px) saturate(220%);
+    border-top: 1px solid var(--apple-border);
+    padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
+    z-index: 90;
+    gap: 8px;
+    align-items: center;
+  }
 
-.btn-whatsapp-support:hover {
-  background: linear-gradient(135deg, #28e06c, #149c8c);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
-}
+  .actions-buttons-row {
+    max-width: var(--ticket-max-width);
+  }
 
-/* Back to portal link button below ticket */
-.btn-text-link {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 0.84rem;
-  font-weight: 600;
-  font-family: inherit;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
+  .btn-primary {
+    min-height: 46px;
+    font-size: 0.9rem;
+    padding: 11px 16px;
+  }
 
-.btn-text-link:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.06);
+  .btn-secondary {
+    min-height: 46px;
+    padding: 11px 16px;
+  }
 }
