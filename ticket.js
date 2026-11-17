@@ -5,7 +5,80 @@
  * Displays the ticket immediately on load, and enables instant PNG download & native sharing.
  */
 
-const SECRET_KEY = 'tripinn-super-secret-key-2026';
+/**
+ * Secret Key Configuration
+ * Decryption secret key is retrieved dynamically from environment sources (runtime window,
+ * server API endpoint, or development config files) rather than hardcoded in git.
+ */
+let cachedSecretKey =
+  (typeof window !== 'undefined' && (window.TRIPINN_SECRET_KEY || window.SECRET_KEY || window.__ENV__?.TRIPINN_SECRET_KEY || window.__ENV__?.SECRET_KEY)) ||
+  (typeof process !== 'undefined' && process.env && (process.env.TRIPINN_SECRET_KEY || process.env.SECRET_KEY)) ||
+  null;
+
+async function getSecretKey() {
+  // 1. Check window global configuration (injected by env.local.js, /api/env.js, or host environment)
+  if (typeof window !== 'undefined') {
+    if (window.TRIPINN_SECRET_KEY) return (cachedSecretKey = window.TRIPINN_SECRET_KEY);
+    if (window.SECRET_KEY) return (cachedSecretKey = window.SECRET_KEY);
+    if (window.__ENV__?.TRIPINN_SECRET_KEY) return (cachedSecretKey = window.__ENV__.TRIPINN_SECRET_KEY);
+    if (window.__ENV__?.SECRET_KEY) return (cachedSecretKey = window.__ENV__.SECRET_KEY);
+  }
+
+  if (cachedSecretKey) return cachedSecretKey;
+
+  // 2. Check process.env (Node / bundler environment)
+  if (typeof process !== 'undefined' && process.env) {
+    if (process.env.TRIPINN_SECRET_KEY) return (cachedSecretKey = process.env.TRIPINN_SECRET_KEY);
+    if (process.env.SECRET_KEY) return (cachedSecretKey = process.env.SECRET_KEY);
+  }
+
+  // 3. Check session/local storage for manual override or saved key
+  try {
+    const stored = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('TRIPINN_SECRET_KEY')) ||
+                   (typeof localStorage !== 'undefined' && localStorage.getItem('TRIPINN_SECRET_KEY'));
+    if (stored) {
+      cachedSecretKey = stored;
+      if (typeof window !== 'undefined') window.TRIPINN_SECRET_KEY = stored;
+      return cachedSecretKey;
+    }
+  } catch (_) {}
+
+  // 4. Fetch from /api/env.js or /api/env (dynamic local server / Vercel serverless function)
+  try {
+    const res = await fetch('/api/env.js');
+    if (res.ok) {
+      const scriptText = await res.text();
+      const match = scriptText.match(/window\.TRIPINN_SECRET_KEY\s*=\s*["']([^"']+)["']/);
+      if (match && match[1]) {
+        cachedSecretKey = match[1];
+        if (typeof window !== 'undefined') window.TRIPINN_SECRET_KEY = cachedSecretKey;
+        return cachedSecretKey;
+      }
+    }
+  } catch (_) {}
+
+  // 5. Fetch from local environment files during development (env.local.js, env.local, .env.local, .env)
+  const envCandidates = ['env.local.js', '/env.local.js', 'env.local', '/env.local', '.env.local', '/.env.local', '.env'];
+  for (const candidate of envCandidates) {
+    try {
+      const response = await fetch(candidate);
+      if (response.ok) {
+        const text = await response.text();
+        const match = text.match(/(?:TRIPINN_SECRET_KEY|SECRET_KEY)\s*[:=]\s*["']?([^"'\r\n#;]+)["']?/);
+        if (match && match[1]) {
+          cachedSecretKey = match[1].trim();
+          if (typeof window !== 'undefined') window.TRIPINN_SECRET_KEY = cachedSecretKey;
+          return cachedSecretKey;
+        }
+      }
+    } catch (_) {}
+  }
+
+  return null;
+}
+
+// Preload secret key in background as soon as script is parsed
+getSecretKey();
 const TICKET_TEMPLATE = 'Template_bg.png';
 
 // Cache loaded template image and current state
@@ -387,12 +460,13 @@ async function displayTicket(rawData) {
 // 7. Error Screen Handlers
 // ============================================================================
 
-function showErrorScreen(message) {
+function showErrorScreen(message, showKeyPrompt = false) {
   const portalCard = document.getElementById('portalLandingCard');
   const ticketStage = document.getElementById('ticketStage');
   const errorContainer = document.getElementById('errorContainer');
   const errorMessageText = document.getElementById('errorMessageText');
   const skeleton = document.getElementById('ticketSkeleton');
+  const configKeyBtn = document.getElementById('configKeyBtn');
 
   if (portalCard) portalCard.style.display = 'none';
   if (ticketStage) ticketStage.style.display = 'none';
@@ -400,6 +474,9 @@ function showErrorScreen(message) {
 
   if (errorMessageText) {
     errorMessageText.textContent = message;
+  }
+  if (configKeyBtn) {
+    configKeyBtn.style.display = showKeyPrompt ? 'inline-flex' : 'none';
   }
   if (errorContainer) {
     errorContainer.style.display = 'block';
@@ -862,7 +939,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function initPassFromHash() {
+  async function initPassFromHash() {
     const passParam = getHashParam('pass');
 
     if (passParam) {
@@ -871,7 +948,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const decrypted = decryptData(passParam, SECRET_KEY);
+      const secretKey = await getSecretKey();
+      if (!secretKey) {
+        showErrorScreen('Decryption key not configured. Please ensure TRIPINN_SECRET_KEY is configured in your environment.', true);
+        return;
+      }
+
+      const decrypted = decryptData(passParam, secretKey);
       if (decrypted) {
         showTicketView();
         displayTicket(decrypted);
@@ -892,7 +975,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const backToPortalBtn = document.getElementById('backToPortalBtn');
   const returnToPortalBtn = document.getElementById('returnToPortalBtn');
 
-  function handlePassLookup() {
+  async function handlePassLookup() {
     if (!passLinkInput) return;
     const rawVal = (passLinkInput.value || '').trim();
     if (!rawVal) {
@@ -914,7 +997,16 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const decrypted = decryptData(token, SECRET_KEY);
+    const secretKey = await getSecretKey();
+    if (!secretKey) {
+      if (lookupError) {
+        lookupError.textContent = 'Decryption key not configured. Please ensure TRIPINN_SECRET_KEY is defined in your environment.';
+        lookupError.style.display = 'block';
+      }
+      return;
+    }
+
+    const decrypted = decryptData(token, secretKey);
     if (decrypted) {
       if (lookupError) lookupError.style.display = 'none';
       window.location.hash = '#pass=' + token;
@@ -996,6 +1088,21 @@ document.addEventListener('DOMContentLoaded', () => {
     returnToPortalBtn.addEventListener('click', () => {
       history.pushState('', document.title, window.location.pathname + window.location.search);
       showPortalView();
+    });
+  }
+
+  const configKeyBtn = document.getElementById('configKeyBtn');
+  if (configKeyBtn) {
+    configKeyBtn.addEventListener('click', async () => {
+      const entered = window.prompt('Enter your TRIPINN_SECRET_KEY to decrypt pass:');
+      if (entered && entered.trim()) {
+        cachedSecretKey = entered.trim();
+        window.TRIPINN_SECRET_KEY = cachedSecretKey;
+        try {
+          sessionStorage.setItem('TRIPINN_SECRET_KEY', cachedSecretKey);
+        } catch (_) {}
+        await initPassFromHash();
+      }
     });
   }
 
